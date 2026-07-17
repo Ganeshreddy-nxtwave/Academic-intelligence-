@@ -11,7 +11,17 @@
 
 The canonical store now holds content, sessions, feedback, the course catalogue, and (after this work) delivered scheduling and the designed HLID/Prod sequence. Answering questions against it currently requires someone who can write SQL and knows the join-key quirks.
 
-**Goal:** a ChatGPT-style Streamlit app where the team asks questions in plain English and gets answers grounded in the data — analytics, content lookup, and open-ended advisory — and which improves from per-answer feedback.
+**Goal:** a ChatGPT-style Streamlit app where the team asks **any question the data can answer**, in plain English, and gets a grounded answer — and which improves from per-answer feedback.
+
+This is a **general-purpose Q&A agent over the whole store**, not a deviation tool. Deviation is one of many things it should handle. The agent must be equally able to answer, for example:
+- *"How many coding questions exist for Data Structures using C++?"* (content)
+- *"Which instructors have the lowest session completion rate?"* (operational)
+- *"Which sessions at CDU rated below 3 for teaching quality?"* (feedback)
+- *"What courses are in the FullStack stack and what are their prerequisites?"* (catalogue)
+- *"Which units were delivered late at MRV vs the plan?"* (deviation)
+- *"What should we change in Sem 1 next year?"* (advisory)
+
+The design must not privilege any one question shape. Coverage of the **schema** is what determines capability.
 
 **Non-goals (v1):**
 - Model fine-tuning. "Learning" is prompt-context (few-shot examples + notes), not training.
@@ -74,18 +84,36 @@ Google Sheet (aip/memory.py): feedback_log | qa_examples | knowledge_notes
 - Load the three new artifacts.
 - Keep the existing `content_units` view.
 - `session_feedback_safe` view — `session_feedback` **minus** the `positive_feedbacks` / `neutral_feedbacks` / `negative_feedbacks` comment-text columns; exposes ratings and `total_feedbacks` only. The agent is pointed at this view, never the base table (§7).
-- `deviation` view — encodes the designed↔delivered join **once** (on `unit_id`, per university) so the agent doesn't reinvent it per question. Columns: university, course, unit_id, planned_start, actual_start, drift_days, status (`delivered` / `dropped` / `added`).
+- `deviation` view — a **convenience view**, one of several. It encodes the designed↔delivered join (on `unit_id`, per university) so the agent need not reinvent the trickiest join in the store. Columns: university, course, unit_id, planned_start, actual_start, drift_days, status (`delivered` / `dropped` / `added`).
 
-Encoding the hard join as a view is the single highest-leverage thing here: it is the join the agent is most likely to get wrong.
+Views exist to pre-solve joins the agent would otherwise get wrong. `deviation` is the first because it is the hardest — not because deviation questions matter more than others. Add further views only when a real question proves a join is being fumbled repeatedly.
 
-### 4.3 Known data caveats the agent must be told
+### 4.3 Data dictionary (the asset that makes "any question" work)
 
-These go into the system prompt verbatim, because they change how answers should be read:
-- Prod-Sequence `unit_id` coverage varies by university (MRV ~82%, SGU ~65%, Yenepoya/CDU ~40%). Low coverage means an **incomplete design export**, not curriculum improvisation — `status='added'` is unreliable for Yenepoya/CDU.
-- Planned dates exist only for MRV; others are derived from `Week` + HLID semester start.
-- MRV's Prod Sequence mixes an original and a "NEW BATCH" re-plan.
-- Fine unit types (classroom quiz / mcq / coding practice / module quiz / reading) are **not** a field — delivered data has only coarse LECTURE/PRACTICE/EXAM × LP_RESOURCE/LP_QUIZ.
-- ~50% of delivered session volume maps to the catalogue via `course_crosswalk`; the rest are `unmapped`.
+`docs/data-dictionary.md` — a maintained description of **every table and column**: what it means, its grain, its allowed values, and its join keys. This file is injected into the system prompt verbatim.
+
+This is the highest-leverage artifact in the design. A general-purpose agent is only as capable as its schema knowledge: without being told that `unit_id` is the universal key, that `session_id` is stored dash-less, that `course_crosswalk` is required to bridge course titles, or that `session_type` is coarse, the agent will silently write plausible wrong SQL. Schema coverage — not clever prompting — is what determines how many questions it can answer.
+
+It is generated from the live DuckDB schema (tables/columns/types) and hand-annotated with meanings and the join-key contract, so it cannot drift silently from the database.
+
+### 4.4 Known data caveats the agent must be told
+
+These go into the system prompt verbatim, because they change how answers should be read.
+
+**Join-key contract (applies to every question):**
+- `unit_id` is the universal key across content, delivered, designed, and feedback. It is the spine — prefer it.
+- `session_id` is stored **dash-less** (32-hex) in `sessions` and `delivered_sessions`. Feedback is normalized to match; never join on a dashed UUID.
+- Course titles do **not** join directly. `course_crosswalk` is required to bridge delivered ↔ catalogue ↔ content; only ~50% of delivered session volume maps, the rest are `unmapped`. Course counts taken without the crosswalk will be wrong.
+- There is **no Subject entity**; `stack` in `courses` is the closest roll-up.
+
+**Coverage / quality caveats (state these when they affect an answer):**
+- Content exists for only ~15 course titles of 63 in the catalogue, and reaches ~19% of delivered units. "No content found" usually means *not ingested*, not *doesn't exist*.
+- Fine unit types (classroom quiz / mcq / coding practice / module quiz / reading) are **not** a field — delivered data has only coarse LECTURE/PRACTICE/EXAM × LP_RESOURCE/LP_QUIZ. Finer types are only inferable from the content tables, for the ~19% covered.
+- ~30% of content units are never scheduled in any delivery.
+- Prod-Sequence `unit_id` coverage varies by university (MRV ~82%, SGU ~65%, Yenepoya/CDU ~40%). Low coverage means an **incomplete design export**, not curriculum improvisation — so `status='added'` is unreliable for Yenepoya/CDU.
+- Planned dates exist only for MRV; others are derived from `Week` + HLID semester start. MRV's Prod Sequence also mixes an original and a "NEW BATCH" re-plan.
+
+**Behavioural rule:** when a caveat materially affects an answer, the agent states it alongside the number. A confident number built on a known-broken join is worse than a caveated one.
 
 ## 5. Agent layer
 
@@ -97,7 +125,8 @@ These go into the system prompt verbatim, because they change how answers should
 - `answer(question, history) -> (text, sql_trace)`.
 - Model is a config value (`MODEL` secret), not hardcoded — per the parent design doc's per-agent model config.
 - Max 5 tool iterations, then answer with what it has or say it couldn't.
-- System prompt = schema dump + §4.3 caveats + all `knowledge_notes` + recent K `qa_examples`.
+- System prompt = **`docs/data-dictionary.md` (§4.3)** + §4.4 caveats + all `knowledge_notes` + recent K `qa_examples`.
+- The prompt is deliberately schema-heavy and instruction-light: breadth of question coverage comes from the agent knowing the data, not from task-specific prompting.
 
 **`aip/memory.py`** — Google Sheets access via service account.
 - `load_notes()`, `load_examples()` — cached (`st.cache_data`, TTL 5 min).
@@ -148,7 +177,9 @@ The through-line: **degrade to "I couldn't answer," never to a confident wrong n
 
 - `tests/test_db.py` — the guardrail is a security path, so it gets real coverage: rejects `INSERT`/`UPDATE`/`DROP`/`ATTACH`/multi-statement; enforces the row cap; a known-count query is stable (MRV Semester 1 = 7,702 delivered session rows).
 - `tests/test_build.py` — Excel-serial → timestamp conversion (a known serial maps to a known date); `deviation` view returns the expected MRV overlap (1,174 units).
-- `tests/test_agent.py` — a ~10-question golden set with the OpenRouter call mocked, asserting tool-call shape and that answers cite SQL. Live-model accuracy is judged by the feedback loop, not unit tests.
+- `tests/test_agent.py` — a golden set with the OpenRouter call mocked, asserting tool-call shape and that answers cite SQL.
+
+**The golden set must span the breadth of the store, not one question shape.** At least two questions per area: content, catalogue, sessions/delivery, feedback/ratings, instructors, course-crosswalk, designed-vs-delivered, and one open-ended advisory. This set is the regression suite for capability — if a whole area has no golden question, that area's coverage is unverified. Live-model accuracy is judged by the feedback loop, not unit tests.
 
 ## 10. Deliberate simplifications (YAGNI)
 
@@ -160,8 +191,8 @@ The through-line: **degrade to "I couldn't answer," never to a confident wrong n
 
 ## 11. Phasing
 
-1. **Data**: `build_delivered.py`, `build_designed.py`, `load_duckdb.py` extensions + views. *Done when:* the `deviation` view reproduces the MRV numbers we already computed by hand (1,174 overlap, 154 dropped).
-2. **Agent core**: `db.py` guardrails + `agent.py` loop, driven from a CLI. *Done when:* the golden-set questions answer correctly with valid SQL.
+1. **Data**: `build_delivered.py`, `build_designed.py`, `load_duckdb.py` extensions + views, and `docs/data-dictionary.md`. *Done when:* every table and column in the store is described in the dictionary, and the `deviation` view reproduces the MRV numbers we already computed by hand (1,174 overlap, 154 dropped).
+2. **Agent core**: `db.py` guardrails + `agent.py` loop, driven from a CLI. *Done when:* the golden set — spanning **all** areas of the store, not just deviation — answers correctly with valid SQL.
 3. **UI + loop**: `app.py` chat, per-response feedback, Sheets memory. *Done when:* a 👍 example and a 👎 note both visibly change a subsequent answer.
 4. **Deploy**: private repo, Streamlit Cloud, secrets, viewer allowlist.
 
