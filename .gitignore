@@ -3,7 +3,12 @@
 
 # large raw source dumps (92MB) — regenerable; canonical CSVs hold the flattened data
 data/raw/
-# build artifact — rebuild with scripts/build_canonical.py
+# build artifact — rebuild with scripts/load_duckdb.py
 data/aip.duckdb
 # python cache
 __pycache__/
+
+# SECRETS — OpenRouter key + Google service-account JSON. Never commit.
+.streamlit/secrets.toml
+# local feedback fallback (used when no Sheet is configured); may contain user text
+data/feedback_local.csv

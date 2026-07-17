@@ -91,13 +91,15 @@ Google Sheet (aip/feedback.py): feedback_log        ← write-only in v1; humans
 
 Views exist to pre-solve joins the agent would otherwise get wrong. `deviation` is the first because it is the hardest — not because deviation questions matter more than others. Add further views only when a real question proves a join is being fumbled repeatedly.
 
-### 4.3 Data dictionary (the asset that makes "any question" work)
+### 4.3 Schema knowledge (the asset that makes "any question" work)
 
-`docs/data-dictionary.md` — a maintained description of **every table and column**: what it means, its grain, its allowed values, and its join keys. This file is injected into the system prompt verbatim.
+Two parts, injected into the system prompt:
+1. **Live schema** — `aip.db.schema_text()` introspects the database at runtime (every table/view, columns, types, row counts).
+2. **`docs/data-notes.md`** — hand-written semantics the schema cannot express: the join-key contract, each table's grain, and the coverage caveats (§4.4).
 
-This is the highest-leverage artifact in the design. A general-purpose agent is only as capable as its schema knowledge: without being told that `unit_id` is the universal key, that `session_id` is stored dash-less, that `course_crosswalk` is required to bridge course titles, or that `session_type` is coarse, the agent will silently write plausible wrong SQL. Schema coverage — not clever prompting — is what determines how many questions it can answer.
+This is the highest-leverage part of the design. A general-purpose agent is only as capable as its schema knowledge: without being told that `unit_id` is the universal key, that `session_id` is stored dash-less, that `course_crosswalk` is required to bridge course titles, or that `session_type` is coarse, the agent will silently write plausible wrong SQL. Schema coverage — not clever prompting — is what determines how many questions it can answer.
 
-It is generated from the live DuckDB schema (tables/columns/types) and hand-annotated with meanings and the join-key contract, so it cannot drift silently from the database.
+**Implementation note:** an earlier draft specified a *generated* `data-dictionary.md`. Live introspection replaces it: same content, no generation step, and it is structurally incapable of drifting from the database. Only the hand-written semantics need maintaining.
 
 ### 4.4 Known data caveats the agent must be told
 
@@ -192,7 +194,9 @@ The through-line: **degrade to "I couldn't answer," never to a confident wrong n
 
 ## 11. Phasing
 
-1. **Data**: `build_delivered.py`, `build_designed.py`, `load_duckdb.py` extensions + views, and `docs/data-dictionary.md`. *Done when:* every table and column in the store is described in the dictionary, and the `deviation` view reproduces the MRV numbers we already computed by hand (1,174 overlap, 154 dropped).
+1. **Data**: `build_delivered.py`, `build_designed.py`, `load_duckdb.py` extensions + views, and `docs/data-notes.md`. *Done when:* every table's grain and join keys are described in the notes, and the `deviation` view returns **MRV: 989 delivered / 89 dropped / 452 added** from 1,078 designed units.
+
+> **Why not the 1,174 / 154 quoted earlier:** that came from a raw scan of *every* UUID appearing anywhere in the Prod workbook, including reference and scratch tabs (Gamma, Tech courses, rough). The shipped extraction only reads sheets that are actually schedules — a unit-id column plus a week/day/start column — which is narrower (1,078 designed units) and more defensible. The earlier figure over-counted the plan.
 2. **Agent core**: `db.py` guardrails + `agent.py` loop, driven from a CLI. *Done when:* the golden set — spanning **all** areas of the store, not just deviation — answers correctly with valid SQL.
 3. **UI + feedback**: `app.py` chat, per-response 👍/👎 + improvement box, Sheets append. *Done when:* a submitted rating appears as a row in the Sheet, and a Sheets outage does not break chat.
 4. **Deploy**: private repo, Streamlit Cloud, secrets, viewer allowlist.

@@ -1,0 +1,42 @@
+university,course,sessions_count,session_hours,practice_hours,micro_assessment_hours,start_timeline,end_timeline,weeks_required
+MRV,Web Application Development-1,75.0,65.0,35.0,15.0,2025-08-11,2025-12-13,14.0
+MRV,Build Your own Static Website,28.0,21.0,12.0,4.0,2025-08-11,2025-12-13,
+MRV,Build Your own Responsive Website Website,15.0,26.0,9.0,4.0,2025-08-11,2025-12-13,
+MRV,Modern Responsive Web Design,17.0,16.0,8.0,4.0,2025-08-11,2025-12-13,
+MRV,Build Your Own Dynamic Web Application,15.0,16.0,9.0,4.0,2025-08-11,2025-12-13,
+MRV,Computer Programming,69.0,54.0,30.0,14.0,2025-08-11,2025-12-13,14.0
+MRV,Mathematics for Computing,39.0,30.0,20.0,7.0,2025-08-11,2025-12-13,14.0
+MRV,Professional Skills for Engineers,30.0,30.0,15.0,4.0,2025-08-11,2025-12-13,14.0
+MRV,Quantitative Skills,31.0,30.0,20.0,6.0,2025-08-11,2025-12-13,14.0
+MRV,Introduction to Generative AI ( Workshop ),7.0,20.0,15.0,12.0,2025-08-11,2025-12-13,14.0
+MRV,Fundamentals of Quantum Computing,16.0,16.0,8.0,0.0,2025-08-11,2025-12-13,14.0
+MRV,Computer Aided Engineering Graphics,8.0,8.0,0.0,0.0,2025-08-11,2025-12-13,14.0
+MRV,Indian Knowledge System,5.0,5.0,1.0,0.0,2025-08-11,2025-12-13,14.0
+Yenepoya,Web Application Development 1,75.0,65.0,35.0,15.0,2025-08-11,2025-12-06,12.0
+Yenepoya,Build Your own Static Website,28.0,21.0,12.0,4.0,2025-08-11,2025-12-06,12.0
+Yenepoya,Build Your own Responsive Website Website,15.0,26.0,9.0,4.0,2025-08-11,2025-12-06,12.0
+Yenepoya,Modern Responsive Web Design,17.0,16.0,8.0,4.0,2025-08-11,2025-12-06,12.0
+Yenepoya,Build Your Own Dynamic Web Application,15.0,16.0,9.0,4.0,2025-08-11,2025-12-06,12.0
+Yenepoya,Computer Programming,69.0,54.0,30.0,14.0,2025-08-11,2025-12-06,12.0
+Yenepoya,Mathematics for Computer Science,39.0,30.0,20.0,7.0,2025-08-11,2025-12-06,12.0
+Yenepoya,Communicative English Foundation,30.0,20.0,25.0,0.0,2025-08-11,2025-12-06,12.0
+Yenepoya,Quantitative Aptitude,31.0,34.0,20.0,7.0,2025-08-11,2025-12-06,12.0
+Yenepoya,Introduction to Generative AI,7.0,20.0,7.0,0.0,2025-08-11,2025-12-06,12.0
+Yenepoya,Basic electronics for cse,,10.0,0.0,0.0,2025-08-11,2025-12-06,12.0
+SGU,Web Application Development 1,75.0,79.0,47.0,15.0,2025-08-18,2025-11-10,10.0
+SGU,Programming for problem solving,69.0,65.0,36.0,15.0,2025-08-18,2025-11-10,10.0
+SGU,Mathematics for Computer Science,39.0,39.0,20.0,2.0,2025-08-18,2025-11-10,10.0
+SGU,Communicative English Foundation,30.0,20.0,15.0,7.0,2025-08-18,2025-11-10,10.0
+SGU,Quantitative Aptitude,31.0,34.0,20.0,7.0,2025-08-18,2025-11-10,10.0
+SGU,Introduction to Generative AI,7.0,20.0,10.0,0.0,2025-08-18,2025-11-10,10.0
+CDU,Web Application Development 1,75.0,79.0,38.0,16.0,2025-08-25,2025-12-08,15.0
+CDU,Build Your own Static Website,28.0,21.0,12.0,4.0,2025-08-25,2025-12-08,
+CDU,Build Your own Responsive Website Website,15.0,26.0,9.0,4.0,2025-08-25,2025-12-08,
+CDU,Modern Responsive Web Design,17.0,16.0,8.0,4.0,2025-08-25,2025-12-08,
+CDU,Build Your Own Dynamic Web Application,15.0,16.0,9.0,4.0,2025-08-25,2025-12-08,
+CDU,Programming for problem solving,69.0,65.0,36.0,15.0,2025-08-25,2025-12-08,15.0
+CDU,Mathematics for Computer Science,39.0,39.0,20.0,7.0,2025-08-25,2025-12-08,15.0
+CDU,Communicative English Foundation,30.0,20.0,25.0,0.0,2025-08-25,2025-12-08,15.0
+CDU,Quantitative Aptitude,31.0,34.0,20.0,7.0,2025-08-25,2025-12-08,15.0
+CDU,Introduction to Generative AI,7.0,25.0,15.0,0.0,2025-08-25,2025-12-08,15.0
+CDU,Applied Physics,,,,0.0,2025-08-25,2025-12-08,15.0
