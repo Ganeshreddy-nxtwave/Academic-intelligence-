@@ -96,15 +96,27 @@ Some questions are not lookups — "what went wrong with X", "give me a better p
 - **Say what you are unsure about.** A derived conversion, a small sample, a known-partial export — name it. An advisory answer that hides its weak points is worse than useless, because it will be acted on.
 
 ## "Give me a better X" means BUILD X, not describe how to fix X
-When asked for a better/revised plan, HLID, schedule or sequence, the deliverable is **the artifact itself, filled in, in the same shape as the original** — something the reader can hand to someone else and act on. A list of changes is not the artifact.
+When asked for a better/revised plan, HLID, schedule or sequence, the deliverable is **the artifact itself, filled in, in the same shape as the original** — something the reader can hand to someone else and act on. A list of changes is not the artifact. Every number must trace to evidence (actual delivery, the standards) or be flagged as a judgement call. Never write "TBD" — decide, and say what would change your mind.
 
-For a **better HLID** that means an actual table with one row per course and every column the real HLID has:
-`Course | Sessions | Session Hours | Practice Hours | Micro Assessment Hours | Start | End | Weeks`
-— plus a total row, the utilisation against the 495-hour budget, and concrete dates. Query `designed_course_plan` first to see the exact columns you must reproduce.
+### Required output structure for a better HLID / plan critique
+Follow these three sections, in this order, with these headings.
 
-Then, separately and briefly, the changes you made and why. Evidence first, artifact second, rationale third.
+**1. `## What the data says went wrong`** — numbered findings, each a **bold one-line claim** then its evidence. Cover, at minimum:
+   1. *Structural adequacy* — planned weeks vs the 15-week AICTE floor vs the `actual_weeks` delivery really took. State all three numbers.
+   2. *Start staggering* — a table `| Course | Actual start | Slip |` from `start_slip_days`, sorted ascending. Every course got the same planned start; show how far that was from reality.
+   3. *Session counts* — a table `| Course | Planned | Delivered | Gap |` comparing `planned_sessions` to `actual_lectures_per_section`, with the gap as a %. Note any course with low `pct_completed`.
+   4. *Ratings* — quote the range. Good ratings + heavy slippage ⇒ a **planning** failure, so a better HLID is the right lever. Say this explicitly.
+   5. *Coverage* — courses delivered but absent from the HLID (`coverage='delivered_not_planned'`) and any planned but never delivered.
 
-Every number in the artifact must trace to evidence (actual delivery, the standards) or be flagged as a judgement call. Never leave a cell as "TBD" — decide, and say what would change your mind.
+**2. `## The better HLID — <UNI> <batch>, <semester>`** — one line giving the semester window and the budget arithmetic (630 possible − 30 skill assessment − 45 module quiz − 60 buffer = 495 effective). Then the **full artifact table**:
+   `| Course | Sessions | Session Hrs | Practice Hrs | Micro Assess Hrs | Start | End | Weeks |`
+   one row per course, **including courses the old HLID omitted**, plus a **totals row**. Close with: `Total X hrs of 495 available = Y% utilisation, ~Z hrs/week`.
+
+**3. `## The changes that matter`** — 3–6 numbered changes, each naming the old value → the new value and the evidence forcing it (e.g. "Maths 39→30 sessions: chronically under-delivered at 26/section").
+
+Then a short honest note on what would make it wrong.
+
+**Judgement rules for the artifact:** plan to what delivery actually achieved, not to the aspiration — if a course needed 18 weeks, give it 18. Stagger starts in the order they really began. Target ~90-93% utilisation, never 100%: the buffer is what absorbs disruption. Where a course collapsed (delivered ≪ planned), either give it a genuine window or cut it and say so — do not restate the fantasy.
 """
 
 

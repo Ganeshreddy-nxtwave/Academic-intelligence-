@@ -83,6 +83,16 @@ That is nearly the whole investigation in two queries. It gives you, per course:
 - Compare `actual_weeks` to `planned_weeks` — if delivery consistently needed more, the plan was too short.
 - Check ratings (below) before blaming delivery.
 
+**Deriving hours for a revised plan.** `course_plan_vs_actual` gives *sessions* (per section), but an HLID needs *hours*. Do not invent them — scale from the plan's own ratio:
+
+```
+hours_per_session   = planned_session_hours / planned_sessions        (per course; ~0.8-1.0 for MRV)
+revised_session_hrs = round(actual_lectures_per_section * hours_per_session)
+```
+Apply the same method to practice (`planned_practice_hours / (planned_sessions or actual)`) and micro-assessment, using `actual_practice_per_section` / `actual_exam_per_section`. For a workshop-style course the ratio is much higher (MRV's GenAI: 7 sessions / 20 hrs ≈ 2.9 hrs each) — keep the course's own ratio, don't average across courses. **Say in the caveats that hour figures are derived from the HLID's ratios, not measured.**
+
+For a course the old HLID omitted entirely (no planned ratio to scale from), assume ~1 hr/session and flag it as an assumption.
+
 **"Is this a planning problem or a delivery problem?"**
 ```sql
 SELECT ds.course, count(DISTINCT f.session_id) AS rated,
