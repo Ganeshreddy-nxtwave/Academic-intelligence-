@@ -41,14 +41,16 @@ def get_db():
 con = get_db()
 API_KEY = secret("OPENROUTER_API_KEY")
 
-# Curated from OpenRouter's live model list — all support tool-calling, which this
-# agent requires. Prices are input/output per million tokens.
-MODEL_CHOICES = {
-    "anthropic/claude-opus-4.8":      "best analysis · $5/$25",
-    "anthropic/claude-opus-4.8-fast": "same quality, faster · $10/$50",
-    "anthropic/claude-sonnet-4.5":    "cheaper, fine for lookups · $3/$15",
-    "anthropic/claude-fable-5":       "alternative · $10/$50",
-}
+# Cost/capability ladder, cheapest first — the slider order. All three support
+# tool-calling (verified against OpenRouter's live list), which this agent requires.
+# Prices are input/output per million tokens.
+MODEL_TIERS = [
+    ("Haiku",  "anthropic/claude-haiku-4.5",  "$1/$5 · fastest, cheapest — counts and lookups"),
+    ("Sonnet", "anthropic/claude-sonnet-4.5", "$3/$15 · balanced — most questions"),
+    ("Opus",   "anthropic/claude-opus-4.8",   "$5/$25 · deepest analysis — planning, HLIDs, advisory"),
+]
+TIER_MODEL = {name: model for name, model, _ in MODEL_TIERS}
+TIER_NOTE = {name: note for name, _, note in MODEL_TIERS}
 
 if "msgs" not in st.session_state:
     st.session_state.msgs = []   # [{role, content}]
@@ -58,20 +60,20 @@ with st.sidebar:
     st.caption("Ask anything the data can answer — content, courses, delivery, "
                "feedback, instructors, plan-vs-actual.")
 
-    # Default to the configured model; if it isn't in the curated list, keep it as an
-    # option so a secrets override is never silently ignored.
+    # AIP_MODEL picks where the slider starts; the slider is the control from then on.
     configured = secret("AIP_MODEL", agent.DEFAULT_MODEL)
-    options = list(MODEL_CHOICES)
-    if configured not in options:
-        options.insert(0, configured)
-    MODEL = st.selectbox(
+    start = next((n for n, m, _ in MODEL_TIERS if m == configured), "Opus")
+    tier = st.select_slider(
         "Model",
-        options,
-        index=options.index(configured),
-        format_func=lambda m: m.split("/")[-1],
-        help="Opus for analysis and planning; Sonnet is cheaper and fine for lookups.",
+        options=[n for n, _, _ in MODEL_TIERS],
+        value=start,
+        help="Slide right for deeper analysis, left for speed and lower cost.",
     )
-    st.caption(MODEL_CHOICES.get(MODEL, "from AIP_MODEL secret"))
+    MODEL = TIER_MODEL[tier]
+    st.caption(TIER_NOTE[tier])
+    if tier == "Haiku":
+        st.caption("⚠️ Haiku is fine for lookups but weaker on multi-step "
+                   "analysis — use Opus for planning questions.")
 
     tables = [t for (t,) in con.execute("SHOW TABLES").fetchall()]
     with st.expander(f"Data ({len(tables)} tables)"):
