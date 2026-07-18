@@ -52,20 +52,33 @@ MODEL_TIERS = [
 TIER_MODEL = {name: model for name, model, _ in MODEL_TIERS}
 TIER_NOTE = {name: note for name, _, note in MODEL_TIERS}
 
-# Starter prompts, grouped by what the copilot does. Clicking one runs it — the entry
-# point that turns a blank chat box into a copilot people can actually start with.
+ALL_COLLEGES = "All colleges"
+DEFAULT_COLLEGE = "S-VYASA"   # fills the {c} slot when no specific college is focused
+
+
+@st.cache_data(show_spinner=False)
+def college_list():
+    """Real colleges with delivery data, for the focus picker."""
+    rows = con.execute("""SELECT institute_name FROM delivered_sessions
+        WHERE institute_name IS NOT NULL
+        GROUP BY 1 HAVING count(*) > 100 ORDER BY 1""").fetchall()
+    return [r[0] for r in rows]
+
+
+# Starter prompts as templates ({c} = the focused college). Clicking one runs it — the
+# entry point that turns a blank chat box into a copilot people can start with.
 STARTERS = {
     "📋 Plan a semester": [
-        "Design Semester 1 for S-VYASA based on their past delivery and feedback, fixing the issues they had.",
-        "Is any college's planned course load over the 495-hour AICTE budget?",
+        "Design Semester 1 for {c} based on their past delivery and feedback, fixing the issues they had.",
+        "Is {c}'s planned course load within the 495-hour AICTE budget?",
     ],
     "🔍 Diagnose a college": [
-        "What went wrong for Aurora in Semester 1? Combine the recorded issues and what the delivery data shows.",
-        "Which MRV courses were delivered late versus their plan, and by how much?",
+        "What went wrong for {c} in Semester 1? Combine the recorded issues and what the delivery data shows.",
+        "Which {c} courses were delivered late or under-delivered versus plan?",
     ],
     "📚 Look up the data": [
         "How many coding questions exist per course?",
-        "Which sessions at CDU rated below 3 for teaching quality?",
+        "Which sessions at {c} rated below 3 for teaching quality?",
         "Which 5 instructors have the lowest session completion rate?",
     ],
 }
@@ -79,6 +92,13 @@ with st.sidebar:
     st.subheader("🎓 NIAT Learning Copilot")
     st.caption("Ask anything about the academic data — content, courses, delivery, "
                "feedback, instructors, and academic planning for any college.")
+
+    focus = st.selectbox(
+        "Focus college",
+        [ALL_COLLEGES] + college_list(),
+        help="Scope questions and starters to one college. Leave on 'All colleges' "
+             "to ask across everything or name a college yourself.",
+    )
 
     # AIP_MODEL picks where the slider starts; the slider is the control from then on.
     configured = secret("AIP_MODEL", agent.DEFAULT_MODEL)
@@ -114,14 +134,20 @@ if not API_KEY:
              "locally, or to Secrets on Streamlit Cloud.")
     st.stop()
 
+# The college that fills {c} in starters and scopes free-typed questions.
+focus_college = DEFAULT_COLLEGE if focus == ALL_COLLEGES else focus
+
 # Landing: show what the copilot can do, as clickable starters. Only when the chat is empty.
 if not st.session_state.msgs:
     st.markdown("#### What can I help you with?")
-    st.caption("Pick one to start, or type your own below. Planning questions do best on the Opus setting.")
+    scope_note = (f"Focused on **{focus}**. " if focus != ALL_COLLEGES else "")
+    st.caption(scope_note + "Pick one to start, or type your own below. "
+               "Planning questions do best on the Opus setting.")
     for group, prompts in STARTERS.items():
         st.markdown(f"**{group}**")
-        cols = st.columns(len(prompts))
-        for col, prompt in zip(cols, prompts):
+        filled = [p.format(c=focus_college) for p in prompts]
+        cols = st.columns(len(filled))
+        for col, prompt in zip(cols, filled):
             if col.button(prompt, key=f"starter::{prompt}", use_container_width=True):
                 st.session_state.pending = prompt
                 st.rerun()
@@ -155,11 +181,17 @@ if question:
     st.session_state.msgs.append({"role": "user", "content": question})
     history = [{"role": m["role"], "content": m["content"]}
                for m in st.session_state.msgs[:-1]]
+    # Scope a free-typed question to the focused college — but only softly, and only if
+    # the user didn't already name a college, so a cross-college question still works.
+    effective = question
+    if focus != ALL_COLLEGES and focus.lower() not in question.lower():
+        effective = (f"{question}\n\n(Assume this is about {focus} unless another "
+                     f"college is named.)")
     with st.chat_message("user"):
         st.markdown(question)
     with st.chat_message("assistant"), st.spinner("Querying the data…"):
         try:
-            text, _ = agent.answer(question, history=history, api_key=API_KEY, model=MODEL, con=con)
+            text, _ = agent.answer(effective, history=history, api_key=API_KEY, model=MODEL, con=con)
         except agent.OpenRouterError as e:
             text = f"❌ Could not reach the model: {e}"
     st.session_state.msgs.append({"role": "assistant", "content": text, "q": question})
