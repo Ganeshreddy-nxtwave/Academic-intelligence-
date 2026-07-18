@@ -3,11 +3,12 @@
 Run locally:  streamlit run app.py
 Deploy:       Streamlit Cloud, with secrets OPENROUTER_API_KEY / AIP_MODEL.
 """
+import datetime
 import os
 
 import streamlit as st
 
-from aip import agent, db
+from aip import agent, db, export
 
 st.set_page_config(page_title="NIAT Learning Copilot", page_icon="🎓", layout="wide")
 
@@ -125,9 +126,25 @@ if not st.session_state.msgs:
                 st.session_state.pending = prompt
                 st.rerun()
 
-for m in st.session_state.msgs:
+for i, m in enumerate(st.session_state.msgs):
     with st.chat_message(m["role"]):
         st.markdown(m["content"])
+        # Export lives under each answer: an answer is often a plan someone needs to share.
+        if m["role"] == "assistant" and not m["content"].startswith("❌"):
+            stem = export.slug(m.get("q", "answer"))
+            today = datetime.date.today().isoformat()
+            c1, c2, _ = st.columns([1, 1, 5])
+            c1.download_button(
+                "⬇ HTML", key=f"html::{i}",
+                data=export.to_html(m["content"], m.get("q", ""), today),
+                file_name=f"{stem}.html", mime="text/html",
+                help="Formatted, printable, opens in any browser — best for sharing.",
+            )
+            c2.download_button(
+                "⬇ Markdown", key=f"md::{i}",
+                data=m["content"], file_name=f"{stem}.md", mime="text/markdown",
+                help="Raw text — for GitHub, editors, or pasting elsewhere.",
+            )
 
 # A question comes from the chat box OR a starter chip; both feed the same path.
 typed = st.chat_input("Ask about the academic data…")
@@ -145,5 +162,5 @@ if question:
             text, _ = agent.answer(question, history=history, api_key=API_KEY, model=MODEL, con=con)
         except agent.OpenRouterError as e:
             text = f"❌ Could not reach the model: {e}"
-    st.session_state.msgs.append({"role": "assistant", "content": text})
+    st.session_state.msgs.append({"role": "assistant", "content": text, "q": question})
     st.rerun()
