@@ -21,6 +21,7 @@ is a thing that will produce a confidently wrong answer if ignored.
 | `designed_sequence` | one row per unit per sheet | The plan (HLID/Prod). **Semester 1 only.** May contain the same `unit_id` more than once (MRV has a "NEW BATCH" re-plan alongside the original) — dedupe by `unit_id` when counting. |
 | `designed_course_plan` | one row per university×course | HLID "Student Journey": planned session counts, hours, start/end timelines. Sem 1 block only. **`is_submodule='True'` rows are components of the course above them — ALWAYS exclude them from any total** (see below). |
 | `deviation` | one row per university×unit | Pre-solved designed↔delivered join. Use this rather than re-deriving it. |
+| `college_summary` | one row per college | **At-a-glance health per college** — sections, courses, scheduled_sessions, pct_completed, teaching_weeks, first/last_session, avg_understanding, avg_teaching, recorded_issues, has_designed_plan. Use for "how is X doing", "compare colleges", "which college is struggling". Semester 1. |
 | `course_plan_vs_actual` | one row per university×course | **Pre-solved plan-vs-delivery, already per-section.** Use this for any "how did the plan hold up / give me a better plan" question. |
 
 ## ⚠️ `designed_course_plan.is_submodule` — read before summing anything
@@ -108,6 +109,13 @@ GROUP BY 1 HAVING count(DISTINCT f.session_id) >= 3 ORDER BY 3;
 Good ratings (4+) alongside heavy slippage ⇒ **planning** problem: fix the HLID. Poor ratings ⇒ **delivery** problem: fixing the HLID will not help.
 
 **"How many sections does a university have?"** — `delivered_niat.section_name` for the 4 designed universities; `delivered_sections` (the exploded view) elsewhere, because `delivered_sessions.batch_section_name` is a comma-separated list.
+
+**"How is college X doing / compare colleges / which is struggling?"**
+```sql
+SELECT * FROM college_summary ORDER BY pct_completed;          -- struggling first
+SELECT * FROM college_summary WHERE institute_name = 'Aurora University';
+```
+One row per college, pre-joined: completion %, ratings, teaching weeks, recorded issue count, whether it has a plan. Lead with the ranked answer; don't turn a comparison into a full diagnosis of each.
 
 **"What issues did college X have / what went wrong for them (recorded)?"**
 ```sql

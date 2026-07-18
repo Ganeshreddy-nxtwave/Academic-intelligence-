@@ -165,6 +165,46 @@ def build(db="data/aip.duckdb", verbose=True):
         LEFT JOIN universities u2 ON u2.institute_name = act.institute_name
         WHERE coalesce(plan.university, u2.code) IS NOT NULL""")
 
+    # college_summary: one row per college — the at-a-glance health view. Powers the
+    # copilot's most common questions ("how is X doing", "compare colleges", "which is
+    # struggling") so it doesn't reassemble the same 4-table join every time.
+    # Semester 1. Only is_scheduled sessions count toward completion.
+    con.execute("""CREATE VIEW college_summary AS
+        WITH d AS (
+            SELECT institute_name,
+                   count(DISTINCT section_name)                          AS sections,
+                   count(DISTINCT course_title)                          AS courses,
+                   count(*) FILTER (WHERE is_scheduled)                  AS scheduled_sessions,
+                   round(100.0 * count(*) FILTER (WHERE session_status='COMPLETED')
+                         / nullif(count(*) FILTER (WHERE is_scheduled), 0), 0) AS pct_completed,
+                   min(start_ts) FILTER (WHERE is_scheduled)::DATE       AS first_session,
+                   max(start_ts) FILTER (WHERE is_scheduled)::DATE       AS last_session,
+                   count(DISTINCT date_trunc('week', start_ts)
+                         ) FILTER (WHERE is_scheduled)                   AS teaching_weeks
+            FROM delivered_niat WHERE semester='Semester 1' GROUP BY 1
+        ),
+        f AS (
+            SELECT institute_name,
+                   round(avg(TRY_CAST(session_understanding_rating AS DOUBLE)), 2) AS avg_understanding,
+                   round(avg(TRY_CAST(teaching_quality_rating AS DOUBLE)), 2)      AS avg_teaching,
+                   count(*)                                              AS rated_sessions
+            FROM session_feedback_safe GROUP BY 1
+        ),
+        i AS (SELECT institute_name, count(DISTINCT issue_id) AS recorded_issues FROM issues GROUP BY 1)
+        SELECT d.institute_name, d.sections, d.courses, d.scheduled_sessions, d.pct_completed,
+               d.teaching_weeks, d.first_session, d.last_session,
+               f.avg_understanding, f.avg_teaching, coalesce(f.rated_sessions, 0) AS rated_sessions,
+               coalesce(i.recorded_issues, 0) AS recorded_issues,
+               (u.code IS NOT NULL) AS has_designed_plan
+        FROM d
+        LEFT JOIN f USING (institute_name)
+        LEFT JOIN i USING (institute_name)
+        LEFT JOIN universities u ON u.institute_name = d.institute_name
+        -- real colleges only: drop internal distribution/training/ops entries
+        WHERE d.scheduled_sessions > 100
+          AND d.institute_name NOT ILIKE '%DC'
+          AND d.institute_name NOT IN ('Training Institute', 'Program_Ops')""")
+
     if verbose:
         print("=== aip.duckdb (from committed canonical) ===")
         for (t,) in con.execute("SHOW TABLES").fetchall():

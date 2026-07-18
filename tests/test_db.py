@@ -96,6 +96,14 @@ def planning_knowledge_present():
     assert r2[0][0] >= 14, f"planning_standards missing rows: {r2[0][0]}"
 
 
+def college_summary_is_clean():
+    """One row per real college; internal DC/training/ops entries excluded."""
+    _, r, _ = db.run_sql("SELECT count(*) FROM college_summary", con)
+    assert 12 <= r[0][0] <= 18, f"college_summary has {r[0][0]} rows — filter may be off"
+    _, junk, _ = db.run_sql("SELECT count(*) FROM college_summary WHERE institute_name ILIKE '%DC'", con)
+    assert junk[0][0] == 0, "internal DC entries leaked into college_summary"
+
+
 def issues_join_to_institutes():
     """Recorded issues must join to delivery on institute_name (not the short code)."""
     _, r, _ = db.run_sql("""SELECT count(DISTINCT i.institute_name)
@@ -135,6 +143,7 @@ check("delivered timestamps are plausible", timestamps_are_real)
 check("deviation planned_start within 2025-26", planned_start_sane)
 check("deviation covers only designed universities", deviation_scoped_to_designed_unis)
 check("scheduling_rules + planning_standards present", planning_knowledge_present)
+check("college_summary is clean (real colleges only)", college_summary_is_clean)
 check("recorded issues join to institutes", issues_join_to_institutes)
 check("session_feedback_safe excludes comment text", feedback_safe_hides_comments)
 
