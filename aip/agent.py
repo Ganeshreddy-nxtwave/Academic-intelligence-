@@ -20,10 +20,10 @@ API_URL = "https://openrouter.ai/api/v1/chat/completions"
 # of sonnet-4.5 ($5/$25 vs $3/$15 per M tok) — override with AIP_MODEL if that matters.
 DEFAULT_MODEL = "anthropic/claude-opus-4.8"
 # Analytical questions need a chain of dependent queries: plan, then actuals, then
-# per-section, then ratings, then standards. At 5 the agent ran out mid-investigation
-# and answered from partial evidence ("Investigation truncated..."). The pre-solved
-# course_plan_vs_actual view now collapses most of that into one query; this is headroom.
-MAX_TOOL_ITERS = 16
+# per-section, then ratings, then standards. A live S-VYASA planning question used all
+# 16 slots (universities with no pre-solved view do more exploratory queries), so give
+# headroom to avoid truncating a real investigation. Lookups still finish in 1-2.
+MAX_TOOL_ITERS = 22
 NOTES_PATH = pathlib.Path(__file__).resolve().parents[1] / "docs" / "data-notes.md"
 
 TOOLS = [{
