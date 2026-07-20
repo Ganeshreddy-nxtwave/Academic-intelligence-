@@ -71,7 +71,10 @@ def render():
         st.info("No colleges with delivery data found.")
         return
     uni = _uni_grid(colleges)
-    sem = st.radio("Semester", ["Semester 1", "Semester 2"], horizontal=True, key="kb_sem")
+    sems = [r[0] for r in con.execute(
+        "SELECT DISTINCT semester FROM delivered_niat WHERE institute_name=? AND semester IS NOT NULL ORDER BY 1",
+        [uni]).fetchall()] or ["Semester 1"]
+    sem = st.radio("Semester", sems, horizontal=True, key="kb_sem")
     st.divider()
     st.subheader(f"{uni} · {sem}")
 

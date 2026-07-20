@@ -139,6 +139,20 @@ def derived_plan_excludes_noise():
     assert keep[0][0] > 0, "real unmapped courses (DBMS) wrongly dropped as noise"
 
 
+def subject_tags_supplement_merged():
+    """The sheet extension (later-semester + typo-variant courses) is merged in."""
+    _, r, _ = db.run_sql("SELECT count(*) FROM subject_tags", con)
+    assert r[0][0] > 300, f"supplement not merged — subject_tags only {r[0][0]} rows"
+    _, daa, _ = db.run_sql("""SELECT count(*) FROM subject_tags
+        WHERE nxtwave_tag='Design and Analysis of Algorithms'""", con)
+    assert daa[0][0] >= 3, f"new S3 tag missing: {daa[0][0]}"
+    # a typo-variant now maps: "DataBase Management System" -> Database Management Systems
+    _, dbms, _ = db.run_sql("""SELECT count(*) FROM subject_tags
+        WHERE lower(university_course) LIKE '%database management system%'
+          AND nxtwave_tag='Database Management Systems'""", con)
+    assert dbms[0][0] >= 5, f"DBMS variants not mapped: {dbms[0][0]}"
+
+
 def subject_tags_crosswalk():
     """The course-name crosswalk exists, is ID-keyed, and maps to canonical tags."""
     _, r, _ = db.run_sql("SELECT count(*) FROM subject_tags WHERE institute_id <> ''", con)
@@ -191,6 +205,7 @@ check("deviation covers only designed universities", deviation_scoped_to_designe
 check("scheduling_rules + planning_standards present", planning_knowledge_present)
 check("course_content ingested + JSON parsed", course_content_parsed)
 check("subject_tags crosswalk (id-keyed, mapped)", subject_tags_crosswalk)
+check("subject_tags supplement merged (sheet extension)", subject_tags_supplement_merged)
 check("derived plan excludes non-curriculum noise", derived_plan_excludes_noise)
 check("chain views (session_link + academic_plan_derived)", chain_views)
 check("college_summary is clean (real colleges only)", college_summary_is_clean)

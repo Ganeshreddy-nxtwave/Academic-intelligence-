@@ -30,6 +30,12 @@ def build(db="data/aip.duckdb", verbose=True):
                   else f"read_csv_auto('{p}', header=true, all_varchar=true)")
         con.execute(f"CREATE TABLE {name} AS SELECT * FROM {reader}")
 
+    # Merge the sheet extension into subject_tags (same columns), then drop the
+    # extra table so the crosswalk stays one table. See build_subject_tags_supplement.py.
+    if ("subject_tags_supplement",) in con.execute("SHOW TABLES").fetchall():
+        con.execute("INSERT INTO subject_tags SELECT * FROM subject_tags_supplement")
+        con.execute("DROP TABLE subject_tags_supplement")
+
     # --- views ---
 
     # is_curriculum: the subjects sheet is the source of truth for what a real

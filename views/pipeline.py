@@ -18,6 +18,7 @@ STAGES = [
     ("build_content.py",     "Course content exports (xlsx/json)",   ["course_content"]),
     ("build_issues.py",      "RCA / issues board (xlsx)",            ["issues"]),
     ("build_subject_tags.py", "1st-Year Subjects sheet (xlsx)",      ["subject_tags"]),
+    ("build_subject_tags_supplement.py", "Sheet extension: later-sem + variant courses", ["subject_tags"]),
     ("build_course_crosswalk.py", "Catalogue + delivered names",     ["course_crosswalk"]),
     ("(committed reference)", "tag → content-course map",            ["tag_content_map"]),
 ]
