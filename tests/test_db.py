@@ -113,6 +113,17 @@ def college_summary_is_clean():
     assert junk[0][0] == 0, "internal DC entries leaked into college_summary"
 
 
+def chain_views():
+    """session_link bridges the two delivery tables (>=70% linked); academic_plan_derived
+    covers all delivered universities."""
+    _, r, _ = db.run_sql("""SELECT count(*) FILTER (WHERE is_scheduled),
+        count(*) FILTER (WHERE is_scheduled AND linked) FROM session_link""", con)
+    tot, lk = r[0]
+    assert tot > 0 and lk / tot >= 0.70, f"session_link linked rate too low: {lk}/{tot}"
+    _, u, _ = db.run_sql("SELECT count(DISTINCT institute_name) FROM academic_plan_derived", con)
+    assert u[0][0] >= 17, f"academic_plan_derived covers too few universities: {u[0][0]}"
+
+
 def subject_tags_crosswalk():
     """The course-name crosswalk exists, is ID-keyed, and maps to canonical tags."""
     _, r, _ = db.run_sql("SELECT count(*) FROM subject_tags WHERE institute_id <> ''", con)
@@ -165,6 +176,7 @@ check("deviation covers only designed universities", deviation_scoped_to_designe
 check("scheduling_rules + planning_standards present", planning_knowledge_present)
 check("course_content ingested + JSON parsed", course_content_parsed)
 check("subject_tags crosswalk (id-keyed, mapped)", subject_tags_crosswalk)
+check("chain views (session_link + academic_plan_derived)", chain_views)
 check("college_summary is clean (real colleges only)", college_summary_is_clean)
 check("recorded issues join to institutes", issues_join_to_institutes)
 check("session_feedback_safe excludes comment text", feedback_safe_hides_comments)

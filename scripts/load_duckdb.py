@@ -216,6 +216,54 @@ def build(db="data/aip.duckdb", verbose=True):
           AND d.institute_name NOT ILIKE '%DC'
           AND d.institute_name NOT IN ('Training Institute', 'Program_Ops')""")
 
+    # session_link: the fuzzy bridge reconnecting the two delivery tables that share no
+    # key. delivered_niat (course + instructor + status) has no session_id/unit_id;
+    # delivered_sessions (session_id + unit_id + feedback link) has no course/instructor.
+    # Bridge on institute + session_title + start-minute (~76% match). `linked` flags it,
+    # so the break stays visible rather than silently dropping rows.
+    con.execute("""CREATE VIEW session_link AS
+        WITH s AS (
+            SELECT institute_name, lower(trim(session_title)) AS tkey,
+                   date_trunc('minute', start_ts) AS tmin,
+                   any_value(session_id) AS session_id, any_value(unit_id) AS unit_id,
+                   any_value(resource_type) AS resource_type
+            FROM delivered_sessions WHERE session_title IS NOT NULL
+            GROUP BY 1, 2, 3
+        )
+        SELECT n.institute_name, n.semester, n.course_title, n.session_title, n.session_type,
+               n.instructor_name, n.instructor_category, n.session_status, n.section_name,
+               n.start_ts, n.end_ts, n.is_scheduled,
+               s.session_id, s.unit_id, s.resource_type,
+               (s.session_id IS NOT NULL) AS linked
+        FROM delivered_niat n
+        LEFT JOIN s ON s.institute_name = n.institute_name
+                   AND s.tkey = lower(trim(n.session_title))
+                   AND s.tmin = date_trunc('minute', n.start_ts)""")
+
+    # academic_plan_derived: planning-style metrics from DELIVERY, per
+    # (institute, semester, course), for ALL universities — designed plans exist for
+    # only 4, so this is the universal "plan" layer (label it derived, not designed).
+    con.execute("""CREATE VIEW academic_plan_derived AS
+        WITH secs AS (SELECT institute_name, semester, count(DISTINCT section_name) n_sections
+                      FROM delivered_niat GROUP BY 1, 2),
+             cohort AS (SELECT institute_name, semester, min(start_ts)::DATE cohort_start
+                        FROM delivered_niat WHERE is_scheduled GROUP BY 1, 2)
+        SELECT d.institute_name, d.semester, d.course_title,
+               round(count(*) FILTER (WHERE d.is_scheduled) * 1.0 / nullif(sc.n_sections, 0), 1) AS sessions_per_section,
+               count(*) FILTER (WHERE d.is_scheduled)                             AS scheduled_sessions,
+               count(DISTINCT date_trunc('week', d.start_ts)) FILTER (WHERE d.is_scheduled) AS teaching_weeks,
+               min(d.start_ts) FILTER (WHERE d.is_scheduled)::DATE                AS first_session,
+               max(d.start_ts) FILTER (WHERE d.is_scheduled)::DATE                AS last_session,
+               date_diff('day', any_value(co.cohort_start),
+                         min(d.start_ts) FILTER (WHERE d.is_scheduled)::DATE)     AS start_slip_days,
+               round(100.0 * count(*) FILTER (WHERE d.session_status='COMPLETED')
+                     / nullif(count(*) FILTER (WHERE d.is_scheduled), 0), 0)      AS pct_completed
+        FROM delivered_niat d
+        JOIN secs sc   USING (institute_name, semester)
+        JOIN cohort co USING (institute_name, semester)
+        WHERE d.course_title IS NOT NULL
+        GROUP BY d.institute_name, d.semester, d.course_title, sc.n_sections""")
+
     if verbose:
         print("=== aip.duckdb (from committed canonical) ===")
         for (t,) in con.execute("SHOW TABLES").fetchall():

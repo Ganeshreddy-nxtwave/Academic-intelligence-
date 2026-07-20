@@ -19,6 +19,7 @@ STAGES = [
     ("build_issues.py",      "RCA / issues board (xlsx)",            ["issues"]),
     ("build_subject_tags.py", "1st-Year Subjects sheet (xlsx)",      ["subject_tags"]),
     ("build_course_crosswalk.py", "Catalogue + delivered names",     ["course_crosswalk"]),
+    ("(committed reference)", "tag → content-course map",            ["tag_content_map"]),
 ]
 
 DOT = """

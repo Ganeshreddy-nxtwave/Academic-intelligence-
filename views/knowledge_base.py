@@ -1,37 +1,69 @@
-"""Knowledge Base page — per-university catalog of everything the system knows.
+"""Knowledge Base — the data-lineage explorer.
 
-Pick a university (clickable grid) -> its delivery overview, its subjects with the
-university's local name mapped to the NxtWave tag (subject_tags crosswalk), the
-content actually delivered there (joined by unit_id, drillable), its feedback,
-recorded issues, and designed plan. All read-only over existing tables/views.
+Walks the full chain and shows how each link holds:
+University -> Semester -> Subject (NxtWave tag) -> Course (local name) -> Session
+-> Scheduling -> Student Feedback -> Instructor Delivery, plus the content aligned
+to it. Includes derived academic planning for every university and an alignment
+panel that flags where links break (the delivered_niat<->delivered_sessions bridge
+is fuzzy, ~76%). All read-only over existing tables + views.
 """
 import streamlit as st
 
 from aip import dashboard
 
+CHAIN_DOT = """
+digraph chain {
+  rankdir=LR; bgcolor="transparent";
+  node [shape=box style="rounded,filled" fillcolor="#f5f5f7" fontname="Helvetica" fontsize=10 color="#d0d0d0"];
+  edge [fontname="Helvetica" fontsize=8 color="#888"];
+  U [label="University" fillcolor="#ede7f6"];
+  S [label="Semester"];
+  Sub [label="Subject\\n(NxtWave tag)" fillcolor="#e3f2fd"];
+  C [label="Course\\n(local name)" fillcolor="#e3f2fd"];
+  Se [label="Session"];
+  Sch [label="Scheduling\\ndata"];
+  F [label="Student\\nFeedback" fillcolor="#e8f5e9"];
+  I [label="Instructor\\nDelivery" fillcolor="#fff3e0"];
+  U -> S [label="institute_name"];
+  S -> Sub [label="semester"];
+  Sub -> C [label="nxtwave_tag"];
+  C -> Se [label="course_title"];
+  Se -> Sch [label="session_id·unit_id"];
+  Sch -> F [label="session_id (76% bridge)"];
+  Se -> I [label="instructor_name"];
+}
+"""
+
 
 def _uni_grid(colleges):
-    """Clickable grid of universities (pills) — all visible, selected one highlighted.
-    Returns the selected institute_name."""
+    """Clickable grid of universities; returns the selected institute_name."""
     if "kb_uni" not in st.session_state or st.session_state.kb_uni not in colleges:
         st.session_state.kb_uni = colleges[0]
     per_row = 4
     for i in range(0, len(colleges), per_row):
         cols = st.columns(per_row)
         for col, name in zip(cols, colleges[i:i + per_row]):
-            selected = name == st.session_state.kb_uni
             if col.button(name, key=f"uni::{name}", width="stretch",
-                          type="primary" if selected else "secondary"):
+                          type="primary" if name == st.session_state.kb_uni else "secondary"):
                 st.session_state.kb_uni = name
                 st.rerun()
     return st.session_state.kb_uni
 
 
+def _flag(pct):
+    return "🟢" if pct >= 80 else "🟡" if pct >= 50 else "🔴"
+
+
 def render():
-    st.title("📚 Knowledge Base")
-    st.caption("Everything the copilot draws on for a university — its subjects "
-               "(their names ↔ ours), delivered content, feedback, issues, and plan.")
+    st.title("📚 Knowledge Base — Data Lineage")
+    st.caption("The full chain, and how well each link holds. "
+               "University → Semester → Subject → Course → Session → Scheduling → Feedback → Instructor.")
     con = dashboard.conn()
+
+    try:
+        st.graphviz_chart(CHAIN_DOT, width="stretch")
+    except Exception:  # noqa: BLE001
+        st.caption("University → Semester → Subject → Course → Session → Scheduling → Feedback → Instructor")
 
     colleges = [r[0] for r in con.execute(
         "SELECT institute_name FROM college_summary ORDER BY 1").fetchall()]
@@ -39,128 +71,162 @@ def render():
         st.info("No colleges with delivery data found.")
         return
     uni = _uni_grid(colleges)
+    sem = st.radio("Semester", ["Semester 1", "Semester 2"], horizontal=True, key="kb_sem")
     st.divider()
-    st.subheader(uni)
+    st.subheader(f"{uni} · {sem}")
 
-    # --- overview ---
-    row = con.execute("""SELECT sections, courses, scheduled_sessions, pct_completed,
-            teaching_weeks, avg_understanding, avg_teaching, recorded_issues, has_designed_plan
-        FROM college_summary WHERE institute_name = ?""", [uni]).fetchone()
-    if row:
-        sec, crs, sess, comp, wks, und, tea, iss, plan = row
-        m = st.columns(6)
-        m[0].metric("Courses", crs)
-        m[1].metric("Sessions", f"{sess:,}" if sess else "0")
-        m[2].metric("Completion", f"{comp:.0f}%" if comp is not None else "—")
-        m[3].metric("Understanding", f"{und}" if und is not None else "—")
-        m[4].metric("Teaching", f"{tea}" if tea is not None else "—")
-        m[5].metric("Issues", iss)
-        st.caption(f"{sec} section(s) · {wks} teaching weeks · "
-                   f"{'has a designed plan' if plan else 'no designed plan on file'}")
+    tabs = st.tabs(["Subjects → Content", "Courses → Sessions", "Academic Planning",
+                    "Alignment", "Feedback", "Issues"])
 
-    tab_subjects, tab_content, tab_fb, tab_issues, tab_plan = st.tabs(
-        ["Subjects", "Content", "Feedback", "Issues", "Plan"])
-
-    # --- SUBJECTS: the crosswalk — their name vs the NxtWave tag ---
-    with tab_subjects:
-        subs = con.execute("""SELECT semester, university_course, nxtwave_tag, credits, course_id
-            FROM subject_tags WHERE institute_name = ?
-            ORDER BY semester, university_course""", [uni]).fetchall()
+    # 1) SUBJECTS -> CONTENT : crosswalk (their name <-> tag) + content counts
+    with tabs[0]:
+        subs = con.execute("""
+            WITH tc AS (
+                SELECT tcm.nxtwave_tag,
+                       count(*) FILTER (WHERE ca.kind='reading')        AS readings,
+                       count(*) FILTER (WHERE ca.kind='objective')      AS objective,
+                       count(*) FILTER (WHERE ca.kind='classroom_quiz') AS quiz,
+                       count(*) FILTER (WHERE ca.kind='coding')         AS coding
+                FROM tag_content_map tcm JOIN content_all ca ON ca.course = tcm.content_course
+                GROUP BY 1)
+            SELECT st.university_course, st.nxtwave_tag, st.credits,
+                   coalesce(tc.readings,0), coalesce(tc.objective,0),
+                   coalesce(tc.quiz,0), coalesce(tc.coding,0)
+            FROM subject_tags st LEFT JOIN tc ON tc.nxtwave_tag = st.nxtwave_tag
+            WHERE st.institute_name = ? AND st.semester = ?
+            ORDER BY st.university_course""", [uni, sem]).fetchall()
         if subs:
-            st.markdown("**This university's subjects, mapped to the NxtWave standard**")
-            st.dataframe(
-                [{"Semester": r[0], "Their course name": r[1], "NxtWave tag": r[2],
-                  "Credits": r[3], "Course ID": r[4]} for r in subs],
+            st.markdown("**Their course name → NxtWave subject → content that belongs to it**")
+            st.dataframe([{
+                "Their course name": r[0], "NxtWave subject (tag)": r[1], "Credits": r[2],
+                "Readings": r[3], "Objective": r[4], "Quiz": r[5], "Coding": r[6],
+                "Content?": "—" if (r[3]+r[4]+r[5]+r[6]) == 0 else "✓"} for r in subs],
                 width="stretch", hide_index=True)
+            st.caption("'—' = no content ingested for that subject yet.")
         else:
-            st.info("No subject-tag mapping on file for this university.")
+            st.info(f"No subject mapping on file for {uni} in {sem}.")
 
-    # --- CONTENT: what content (by unit_id) was actually delivered here ---
-    with tab_content:
-        pivot = con.execute("""
-            WITH du AS (SELECT DISTINCT unit_id FROM delivered_sessions
-                        WHERE institute_name = ? AND unit_id IS NOT NULL)
-            SELECT ca.course AS course,
-                   count(*) FILTER (WHERE ca.kind='reading')        AS readings,
-                   count(*) FILTER (WHERE ca.kind='objective')      AS objective,
-                   count(*) FILTER (WHERE ca.kind='classroom_quiz') AS classroom_quiz,
-                   count(*) FILTER (WHERE ca.kind='coding')         AS coding,
-                   count(*) AS total
-            FROM content_all ca JOIN du USING (unit_id)
-            GROUP BY 1 ORDER BY total DESC""", [uni]).fetchall()
-        st.markdown("**Content delivered here** (matched by unit — what students "
-                    "at this university actually saw)")
-        if pivot:
-            st.dataframe(
-                [{"Course": r[0], "Readings": r[1], "Objective": r[2],
-                  "Classroom quiz": r[3], "Coding": r[4], "Total units": r[5]} for r in pivot],
-                width="stretch", hide_index=True)
+    # 2) COURSES -> SESSIONS : the chain rows (scheduling + feedback + instructor)
+    with tabs[1]:
+        courses = [r[0] for r in con.execute("""SELECT DISTINCT course_title FROM session_link
+            WHERE institute_name = ? AND semester = ? AND course_title IS NOT NULL
+            ORDER BY 1""", [uni, sem]).fetchall()]
+        if not courses:
+            st.info(f"No delivered courses for {uni} in {sem}.")
         else:
-            st.info("No ingested content matched this university's delivered units yet.")
+            course = st.selectbox("Course", courses, key="kb_course")
+            total = con.execute("""SELECT count(*) FROM session_link
+                WHERE institute_name=? AND semester=? AND course_title=? AND is_scheduled""",
+                [uni, sem, course]).fetchone()[0]
+            rows = con.execute("""
+                SELECT sl.session_title, sl.session_type, sl.instructor_name, sl.session_status,
+                       sl.start_ts, sl.section_name, sl.linked,
+                       f.teaching_quality_rating, (sl.unit_id IS NOT NULL) AS has_unit
+                FROM session_link sl
+                LEFT JOIN session_feedback_safe f
+                       ON f.session_id = sl.session_id AND f.institute_name = sl.institute_name
+                WHERE sl.institute_name=? AND sl.semester=? AND sl.course_title=? AND sl.is_scheduled
+                ORDER BY sl.start_ts LIMIT 200""", [uni, sem, course]).fetchall()
+            st.caption(f"{total:,} scheduled sessions in {course} — showing first {len(rows)}. "
+                       "'Linked' = matched to scheduling/unit data (fuzzy bridge).")
+            st.dataframe([{
+                "Session": r[0], "Type": r[1], "Instructor": r[2] or "—", "Status": r[3] or "—",
+                "When": str(r[4])[:16], "Section": r[5], "Linked": "✓" if r[6] else "✗",
+                "Teaching rating": r[7] or "—", "Has content unit": "✓" if r[8] else "—"}
+                for r in rows], width="stretch", hide_index=True)
 
-        courses_with_content = [r[0] for r in con.execute(
-            "SELECT DISTINCT course FROM course_content ORDER BY 1").fetchall()]
-        if courses_with_content:
-            st.markdown("**Browse a course's content**")
-            course = st.selectbox("Course", courses_with_content, key="kb_course")
-            total = con.execute("SELECT count(*) FROM course_content WHERE course = ?",
-                                [course]).fetchone()[0]
-            rows = con.execute("""SELECT kind, difficulty, content, options, correct_answer
-                FROM course_content WHERE course = ? ORDER BY kind LIMIT 100""",
-                [course]).fetchall()
-            st.caption(f"{total:,} units in {course} — showing first {len(rows)}")
-            st.dataframe(
-                [{"Kind": r[0], "Difficulty": r[1] or "", "Content": (r[2] or "")[:300],
-                  "Options": (r[3] or "")[:200], "Answer": (r[4] or "")[:120]} for r in rows],
+    # 3) ACADEMIC PLANNING : derived (all unis) + designed (the 4)
+    with tabs[2]:
+        st.markdown("**Derived from delivery** (available for every university)")
+        dp = con.execute("""SELECT course_title, sessions_per_section, teaching_weeks,
+                first_session, last_session, start_slip_days, pct_completed
+            FROM academic_plan_derived WHERE institute_name=? AND semester=?
+            ORDER BY scheduled_sessions DESC""", [uni, sem]).fetchall()
+        if dp:
+            st.dataframe([{
+                "Course": r[0], "Sessions/section": r[1], "Teaching weeks": r[2],
+                "First": str(r[3]), "Last": str(r[4]), "Start slip (days)": r[5],
+                "Completion %": r[6]} for r in dp], width="stretch", hide_index=True)
+        else:
+            st.info("No delivery to derive planning from for this selection.")
+        designed = con.execute("""SELECT course, planned_sessions, actual_lectures_per_section,
+                planned_total_hours, planned_weeks
+            FROM course_plan_vs_actual
+            WHERE university IN (SELECT code FROM universities WHERE institute_name=?)
+            ORDER BY planned_sessions DESC NULLS LAST""", [uni]).fetchall()
+        if designed and sem == "Semester 1":
+            st.markdown("**Designed plan** (HLID/Prod — only MRV, Yenepoya, SGU, CDU)")
+            st.dataframe([{
+                "Course": r[0], "Planned sessions": r[1], "Actual/section": r[2],
+                "Planned hrs": r[3], "Planned weeks": r[4]} for r in designed],
                 width="stretch", hide_index=True)
 
-    # --- FEEDBACK ---
-    with tab_fb:
-        agg = con.execute("""SELECT count(*), sum(TRY_CAST(total_feedbacks AS INT)),
-                round(avg(TRY_CAST(session_understanding_rating AS DOUBLE)),2),
+    # 4) ALIGNMENT : how well each link in the chain holds
+    with tabs[3]:
+        st.markdown("**How well the chain links up for this university & semester**")
+        # course -> tag coverage
+        cov = con.execute("""
+            WITH courses AS (SELECT DISTINCT course_title FROM session_link
+                             WHERE institute_name=? AND semester=? AND course_title IS NOT NULL),
+                 tagged AS (SELECT DISTINCT university_course FROM subject_tags
+                            WHERE institute_name=? AND semester=?)
+            SELECT (SELECT count(*) FROM courses) c,
+                   (SELECT count(*) FROM courses WHERE course_title IN (SELECT university_course FROM tagged)) t
+            """, [uni, sem, uni, sem]).fetchone()
+        link = con.execute("""SELECT count(*) FILTER (WHERE is_scheduled),
+                count(*) FILTER (WHERE is_scheduled AND linked),
+                count(*) FILTER (WHERE is_scheduled AND instructor_name IS NOT NULL)
+            FROM session_link WHERE institute_name=? AND semester=?""", [uni, sem]).fetchone()
+        fb = con.execute("""SELECT count(*) FILTER (WHERE sl.is_scheduled AND sl.session_id IS NOT NULL),
+                count(DISTINCT sl.session_id) FILTER (WHERE f.session_id IS NOT NULL)
+            FROM session_link sl LEFT JOIN session_feedback_safe f
+                 ON f.session_id=sl.session_id AND f.institute_name=sl.institute_name
+            WHERE sl.institute_name=? AND sl.semester=?""", [uni, sem]).fetchone()
+
+        def pct(n, d):
+            return round(100 * n / d) if d else 0
+        sched = link[0] or 1
+        checks = [
+            ("Subject ↔ Course", pct(cov[1], cov[0]), f"{cov[1]}/{cov[0]} delivered courses tagged"),
+            ("Session ↔ Scheduling", pct(link[1], sched), f"{link[1]:,}/{sched:,} sessions linked to scheduling/units (fuzzy bridge)"),
+            ("Session ↔ Instructor", pct(link[2], sched), f"{link[2]:,}/{sched:,} sessions have a named instructor"),
+            ("Session ↔ Feedback", pct(fb[1], fb[0] or 1), f"{fb[1]:,}/{fb[0]:,} linkable sessions have feedback"),
+        ]
+        for label, p, detail in checks:
+            c1, c2 = st.columns([1, 3])
+            c1.metric(label, f"{_flag(p)} {p}%")
+            c2.caption(detail)
+        st.caption("The Session↔Scheduling bridge is fuzzy (institute + session title + start-minute) "
+                   "because delivered_niat and delivered_sessions share no key — this is the known break.")
+
+    # 5) FEEDBACK
+    with tabs[4]:
+        agg = con.execute("""SELECT count(*), round(avg(TRY_CAST(session_understanding_rating AS DOUBLE)),2),
                 round(avg(TRY_CAST(teaching_quality_rating AS DOUBLE)),2)
-            FROM session_feedback_safe WHERE institute_name = ?""", [uni]).fetchone()
+            FROM session_feedback_safe WHERE institute_name=?""", [uni]).fetchone()
         if agg and agg[0]:
             f = st.columns(3)
             f[0].metric("Rated sessions", f"{agg[0]:,}")
-            f[1].metric("Avg understanding", agg[2])
-            f[2].metric("Avg teaching", agg[3])
+            f[1].metric("Avg understanding", agg[1])
+            f[2].metric("Avg teaching", agg[2])
             low = con.execute("""SELECT session_title, teaching_quality_rating, total_feedbacks
-                FROM session_feedback_safe WHERE institute_name = ?
+                FROM session_feedback_safe WHERE institute_name=?
                 AND TRY_CAST(teaching_quality_rating AS DOUBLE) IS NOT NULL
                 ORDER BY TRY_CAST(teaching_quality_rating AS DOUBLE) LIMIT 10""", [uni]).fetchall()
-            st.markdown("**Lowest-rated sessions (teaching quality)**")
+            st.markdown("**Lowest-rated sessions**")
             st.dataframe([{"Session": r[0], "Teaching": r[1], "Feedbacks": r[2]} for r in low],
                          width="stretch", hide_index=True)
         else:
             st.info("No feedback recorded for this university.")
 
-    # --- ISSUES ---
-    with tab_issues:
-        issues = con.execute("""SELECT primary_layer, category, issue_title,
-                solutioning_direction, status
-            FROM issues WHERE institute_name = ? ORDER BY primary_layer""", [uni]).fetchall()
+    # 6) ISSUES
+    with tabs[5]:
+        issues = con.execute("""SELECT primary_layer, category, issue_title, solutioning_direction, status
+            FROM issues WHERE institute_name=? ORDER BY primary_layer""", [uni]).fetchall()
         if issues:
             st.caption(f"{len(issues)} recorded issue(s)")
-            st.dataframe(
-                [{"Layer": r[0], "Category": r[1], "Issue": r[2],
-                  "Solutioning direction": r[3], "Status": r[4]} for r in issues],
-                width="stretch", hide_index=True)
+            st.dataframe([{"Layer": r[0], "Category": r[1], "Issue": r[2],
+                           "Solutioning direction": r[3], "Status": r[4]} for r in issues],
+                         width="stretch", hide_index=True)
         else:
-            st.info("No recorded issues for this university "
-                    "(issues are logged mainly for Aurora / MRV / CDU).")
-
-    # --- PLAN ---
-    with tab_plan:
-        plan_rows = con.execute("""SELECT course, planned_sessions, actual_lectures_per_section,
-                planned_total_hours, planned_weeks, coverage
-            FROM course_plan_vs_actual
-            WHERE university IN (SELECT code FROM universities WHERE institute_name = ?)
-            ORDER BY planned_sessions DESC NULLS LAST""", [uni]).fetchall()
-        if plan_rows:
-            st.dataframe(
-                [{"Course": r[0], "Planned sessions": r[1], "Actual/section": r[2],
-                  "Planned hrs": r[3], "Planned weeks": r[4], "Coverage": r[5]} for r in plan_rows],
-                width="stretch", hide_index=True)
-        else:
-            st.info("No designed plan on file — only MRV, Yenepoya, SGU, and CDU have one.")
+            st.info("No recorded issues (logged mainly for Aurora / MRV / CDU).")
