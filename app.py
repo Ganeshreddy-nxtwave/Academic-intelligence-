@@ -140,8 +140,6 @@ with st.sidebar:
     )
     MODEL = TIER_MODEL[tier]
     name_slot.markdown(f"**Model** &nbsp; `{MODEL}`")
-    # A one-line legend of what's on the slider — so people know the models without prices.
-    st.caption("Haiku · fast   |   Sonnet · balanced   |   Opus · deepest analysis")
     if tier.startswith("Haiku"):
         st.caption("⚠️ Light on multi-step analysis — slide to Opus for planning.")
 
