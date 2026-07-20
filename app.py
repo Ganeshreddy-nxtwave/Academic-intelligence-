@@ -5,7 +5,9 @@ Deploy:       Streamlit Cloud, with secrets OPENROUTER_API_KEY / AIP_MODEL.
 """
 import datetime
 import os
+import tempfile
 
+import duckdb
 import streamlit as st
 
 from aip import agent, db, export
@@ -24,33 +26,39 @@ def secret(name, default=None):
 
 
 @st.cache_resource
-def build_db_once():
-    """Rebuild aip.duckdb from committed data — once per boot.
+def db_path():
+    """Build the DB once per boot into a PROCESS-UNIQUE path, and return it.
 
-    ALWAYS rebuild — do not skip when the file exists. Streamlit Cloud keeps the
-    container filesystem across restarts, so a "build only if missing" check served a
-    database built by older code forever. The rebuild takes ~2.6s and @st.cache_resource
-    runs it once per boot. Returns only the path — NOT a connection (see below).
+    Do NOT rebuild a shared data/aip.duckdb in place. DuckDB holds a file lock, so
+    rebuilding (a write) while any read-only connection is open — or when a prior crash
+    left a stale lock/WAL file — raises ConnectionException. A fresh per-process path has
+    no prior file, no lock to fight, and multiple read-only readers can share it safely.
+    Rebuilds every boot (~2.6s), so a new deploy never serves stale data.
     """
     import scripts.load_duckdb as loader
-    loader.build(db.DB_PATH, verbose=False)
-    return db.DB_PATH
+    path = os.path.join(tempfile.gettempdir(), f"aip_{os.getpid()}.duckdb")
+    loader.build(path, verbose=False)
+    return path
 
 
-build_db_once()
-# A fresh read-only connection PER run, never cached. A single DuckDB connection cached
-# via st.cache_resource is shared across Streamlit's concurrent session threads, and
-# DuckDB connections are NOT thread-safe — concurrent use returns None / raises
-# TypeError on Cloud (never seen with one local session). Multiple read-only connections
-# to the same file are safe and cheap.
-con = db.connect()
+DB = db_path()
+
+
+def conn():
+    """A fresh read-only connection, never cached. Cheap, and many read-only readers to
+    one file are safe — unlike a single cached connection, which DuckDB (not thread-safe)
+    corrupts when Streamlit shares it across concurrent session threads."""
+    return duckdb.connect(DB, read_only=True)
+
+
+con = conn()
 
 
 @st.cache_data(ttl=600, show_spinner=False)
 def table_counts():
     """Table names + row counts, computed once (not 25 queries every rerun) on an
     isolated connection — the sidebar loop was the main concurrent-access offender."""
-    c = db.connect()
+    c = conn()
     try:
         out = []
         for (t,) in c.execute("SHOW TABLES").fetchall():
@@ -95,7 +103,7 @@ DEFAULT_COLLEGE = "S-VYASA"   # fills the {c} slot when no specific college is f
 @st.cache_data(show_spinner=False)
 def college_list():
     """Real colleges with delivery data, for the focus picker. Own connection."""
-    c = db.connect()
+    c = conn()
     try:
         return [r[0] for r in c.execute("""SELECT institute_name FROM delivered_sessions
             WHERE institute_name IS NOT NULL
