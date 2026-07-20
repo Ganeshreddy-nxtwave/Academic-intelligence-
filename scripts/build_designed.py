@@ -24,7 +24,7 @@ RAW = "data/raw/design"
 OUT = "data/canonical"
 os.makedirs(OUT, exist_ok=True)
 UUID = re.compile(r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$")
-UNIS = ["MRV", "Yenepoya", "SGU", "CDU"]
+UNIS = ["MRV", "Yenepoya", "SGU", "CDU", "ADYPU"]
 
 EPOCH = None  # serials converted via datetime below
 
@@ -210,8 +210,10 @@ def extract_hlid(uni, path):
 
 seq_rows, plan_rows = [], []
 for uni in UNIS:
-    prod, used = extract_prod(uni, f"{RAW}/{uni}-prod.xlsx")
-    plan = extract_hlid(uni, f"{RAW}/{uni}-hlid.xlsx")
+    prod_path, hlid_path = f"{RAW}/{uni}-prod.xlsx", f"{RAW}/{uni}-hlid.xlsx"
+    # some universities supply only the HLID (course-level plan), no unit-level Prod Sequence
+    prod, used = extract_prod(uni, prod_path) if os.path.exists(prod_path) else ([], [])
+    plan = extract_hlid(uni, hlid_path) if os.path.exists(hlid_path) else []
     seq_rows += prod
     plan_rows += plan
     dated = sum(1 for r in prod if r["planned_start"])
