@@ -1,7 +1,8 @@
 """Knowledge Base page — per-university catalog of everything the system knows.
 
-Pick a university -> its delivery overview, the content actually delivered there
-(joined by unit_id, drillable to the real questions/readings), its feedback,
+Pick a university (clickable grid) -> its delivery overview, its subjects with the
+university's local name mapped to the NxtWave tag (subject_tags crosswalk), the
+content actually delivered there (joined by unit_id, drillable), its feedback,
 recorded issues, and designed plan. All read-only over existing tables/views.
 """
 import streamlit as st
@@ -9,10 +10,27 @@ import streamlit as st
 from aip import dashboard
 
 
+def _uni_grid(colleges):
+    """Clickable grid of universities (pills) — all visible, selected one highlighted.
+    Returns the selected institute_name."""
+    if "kb_uni" not in st.session_state or st.session_state.kb_uni not in colleges:
+        st.session_state.kb_uni = colleges[0]
+    per_row = 4
+    for i in range(0, len(colleges), per_row):
+        cols = st.columns(per_row)
+        for col, name in zip(cols, colleges[i:i + per_row]):
+            selected = name == st.session_state.kb_uni
+            if col.button(name, key=f"uni::{name}", width="stretch",
+                          type="primary" if selected else "secondary"):
+                st.session_state.kb_uni = name
+                st.rerun()
+    return st.session_state.kb_uni
+
+
 def render():
     st.title("📚 Knowledge Base")
-    st.caption("Everything the copilot draws on for a given university — the content "
-               "delivered there, its feedback, issues, and plan.")
+    st.caption("Everything the copilot draws on for a university — its subjects "
+               "(their names ↔ ours), delivered content, feedback, issues, and plan.")
     con = dashboard.conn()
 
     colleges = [r[0] for r in con.execute(
@@ -20,7 +38,9 @@ def render():
     if not colleges:
         st.info("No colleges with delivery data found.")
         return
-    uni = st.selectbox("University", colleges)
+    uni = _uni_grid(colleges)
+    st.divider()
+    st.subheader(uni)
 
     # --- overview ---
     row = con.execute("""SELECT sections, courses, scheduled_sessions, pct_completed,
@@ -38,8 +58,22 @@ def render():
         st.caption(f"{sec} section(s) · {wks} teaching weeks · "
                    f"{'has a designed plan' if plan else 'no designed plan on file'}")
 
-    tab_content, tab_fb, tab_issues, tab_plan = st.tabs(
-        ["Content", "Feedback", "Issues", "Plan"])
+    tab_subjects, tab_content, tab_fb, tab_issues, tab_plan = st.tabs(
+        ["Subjects", "Content", "Feedback", "Issues", "Plan"])
+
+    # --- SUBJECTS: the crosswalk — their name vs the NxtWave tag ---
+    with tab_subjects:
+        subs = con.execute("""SELECT semester, university_course, nxtwave_tag, credits, course_id
+            FROM subject_tags WHERE institute_name = ?
+            ORDER BY semester, university_course""", [uni]).fetchall()
+        if subs:
+            st.markdown("**This university's subjects, mapped to the NxtWave standard**")
+            st.dataframe(
+                [{"Semester": r[0], "Their course name": r[1], "NxtWave tag": r[2],
+                  "Credits": r[3], "Course ID": r[4]} for r in subs],
+                width="stretch", hide_index=True)
+        else:
+            st.info("No subject-tag mapping on file for this university.")
 
     # --- CONTENT: what content (by unit_id) was actually delivered here ---
     with tab_content:
@@ -54,8 +88,8 @@ def render():
                    count(*) AS total
             FROM content_all ca JOIN du USING (unit_id)
             GROUP BY 1 ORDER BY total DESC""", [uni]).fetchall()
-        st.markdown("**Content delivered here** (matched by unit, so it reflects what "
-                    "students at this university actually saw)")
+        st.markdown("**Content delivered here** (matched by unit — what students "
+                    "at this university actually saw)")
         if pivot:
             st.dataframe(
                 [{"Course": r[0], "Readings": r[1], "Objective": r[2],
@@ -64,7 +98,6 @@ def render():
         else:
             st.info("No ingested content matched this university's delivered units yet.")
 
-        # drill-down into one course's actual content
         courses_with_content = [r[0] for r in con.execute(
             "SELECT DISTINCT course FROM course_content ORDER BY 1").fetchall()]
         if courses_with_content:
@@ -80,18 +113,6 @@ def render():
                 [{"Kind": r[0], "Difficulty": r[1] or "", "Content": (r[2] or "")[:300],
                   "Options": (r[3] or "")[:200], "Answer": (r[4] or "")[:120]} for r in rows],
                 width="stretch", hide_index=True)
-
-        # courses delivered but with no ingested content (honest coverage gap)
-        gaps = con.execute("""
-            WITH du AS (SELECT DISTINCT unit_id FROM delivered_sessions
-                        WHERE institute_name = ? AND unit_id IS NOT NULL),
-                 covered AS (SELECT DISTINCT course FROM content_all ca JOIN du USING (unit_id))
-            SELECT DISTINCT course_title FROM delivered_niat
-            WHERE institute_name = ? AND course_title NOT IN (SELECT course FROM covered)
-            ORDER BY 1""", [uni, uni]).fetchall()
-        if gaps:
-            with st.expander(f"Courses delivered here with no ingested content ({len(gaps)})"):
-                st.write(", ".join(g[0] for g in gaps if g[0]))
 
     # --- FEEDBACK ---
     with tab_fb:

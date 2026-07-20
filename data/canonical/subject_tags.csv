@@ -1,0 +1,260 @@
+semester,institute_id,university_short,institute_name,university_course,nxtwave_tag,course_id,credits
+Semester 1,e593b081-bebe-450a-b433-8f942ab87686,MRV,Malla Reddy Vishwavidyapeeth,Web Application Development-1,Web Application Development 1,6d41f350-76d5-4337-9be0-3fe0b26b1b26,5.0
+Semester 1,e593b081-bebe-450a-b433-8f942ab87686,MRV,Malla Reddy Vishwavidyapeeth,Computer Programming,Computer Programming,c6008f8d-cd91-4843-bb3f-b75d4beca046,5.0
+Semester 1,e593b081-bebe-450a-b433-8f942ab87686,MRV,Malla Reddy Vishwavidyapeeth,Mathematics for Computing,Mathematics for Computer Science,70850c6b-459c-4134-a16c-3e42d46eb794,3.0
+Semester 1,e593b081-bebe-450a-b433-8f942ab87686,MRV,Malla Reddy Vishwavidyapeeth,Professional Skills for Engineers,Communicative English Foundation,f903dc8e-fe3f-4977-86ad-d72d7690d38d,2.0
+Semester 1,e593b081-bebe-450a-b433-8f942ab87686,MRV,Malla Reddy Vishwavidyapeeth,Quantitative Skills,Quantitative Aptitude,97671af2-f44f-4eed-978c-d65d5c0c55c9,3.0
+Semester 1,e593b081-bebe-450a-b433-8f942ab87686,MRV,Malla Reddy Vishwavidyapeeth,Fundamentals of Quantum Computing,Compliance,746ffae9-adee-45d3-8716-bc0cf07bc264,2.0
+Semester 1,e593b081-bebe-450a-b433-8f942ab87686,MRV,Malla Reddy Vishwavidyapeeth,Indian Knowledge System,Compliance,27ea918a-df83-4500-98d8-fe137323ef63,1.0
+Semester 1,e593b081-bebe-450a-b433-8f942ab87686,MRV,Malla Reddy Vishwavidyapeeth,Foriegn Language - 1,Compliance,fc6a31de-0cea-4528-9eed-113d04d1597f,0.0
+Semester 1,e593b081-bebe-450a-b433-8f942ab87686,MRV,Malla Reddy Vishwavidyapeeth,Computer Aided Engineering Graphics,Compliance,a2e3e612-2f54-4b74-8a7c-1e3c6251fc1c,2.0
+Semester 1,e593b081-bebe-450a-b433-8f942ab87686,MRV,Malla Reddy Vishwavidyapeeth,Introduction to Generative AI,Introduction to Generative AI,b9811b34-585b-47e0-a0be-65f1081a74f2,0.0
+Semester 1,4134c4fe-97a2-4846-b95f-bd9b51d854d7,Yenepoya,Yenapoya University,Web Application Development-1,Web Application Development 1,6d41f350-76d5-4337-9be0-3fe0b26b1b26,5.0
+Semester 1,4134c4fe-97a2-4846-b95f-bd9b51d854d7,Yenepoya,Yenapoya University,Problem Solving with Python,Computer Programming,c6008f8d-cd91-4843-bb3f-b75d4beca046,6.0
+Semester 1,4134c4fe-97a2-4846-b95f-bd9b51d854d7,Yenepoya,Yenapoya University,Mathematics for Computer Science,Mathematics for Computer Science,70850c6b-459c-4134-a16c-3e42d46eb794,3.0
+Semester 1,4134c4fe-97a2-4846-b95f-bd9b51d854d7,Yenepoya,Yenapoya University,Communicative English Foundation,Communicative English Foundation,f903dc8e-fe3f-4977-86ad-d72d7690d38d,2.0
+Semester 1,4134c4fe-97a2-4846-b95f-bd9b51d854d7,Yenepoya,Yenapoya University,Quantitative Aptitude,Quantitative Aptitude,97671af2-f44f-4eed-978c-d65d5c0c55c9,0.0
+Semester 1,4134c4fe-97a2-4846-b95f-bd9b51d854d7,Yenepoya,Yenapoya University,Introduction to Generative AI,Introduction to Generative AI,b9811b34-585b-47e0-a0be-65f1081a74f2,2.0
+Semester 1,4134c4fe-97a2-4846-b95f-bd9b51d854d7,Yenepoya,Yenapoya University,Basic electronics for cse,Compliance,1fdd2d40-41a5-40cc-a065-f5f927141342,2.0
+Semester 1,8170360b-24f7-45b1-8f25-5733893ebdda,SGU,Sanjay Ghodawat University,Web Application Development I,Web Application Development 1,6d41f350-76d5-4337-9be0-3fe0b26b1b26,5.0
+Semester 1,8170360b-24f7-45b1-8f25-5733893ebdda,SGU,Sanjay Ghodawat University,Computer Programming,Computer Programming,c6008f8d-cd91-4843-bb3f-b75d4beca046,6.0
+Semester 1,8170360b-24f7-45b1-8f25-5733893ebdda,SGU,Sanjay Ghodawat University,Mathematics for Computer Science,Mathematics for Computer Science,70850c6b-459c-4134-a16c-3e42d46eb794,3.0
+Semester 1,8170360b-24f7-45b1-8f25-5733893ebdda,SGU,Sanjay Ghodawat University,Communicative English Foundation,Communicative English Foundation,f903dc8e-fe3f-4977-86ad-d72d7690d38d,2.0
+Semester 1,8170360b-24f7-45b1-8f25-5733893ebdda,SGU,Sanjay Ghodawat University,Quantitative Aptitude,Quantitative Aptitude,97671af2-f44f-4eed-978c-d65d5c0c55c9,3.0
+Semester 1,8170360b-24f7-45b1-8f25-5733893ebdda,SGU,Sanjay Ghodawat University,Introduction to Generative AI,Introduction to Generative AI,b9811b34-585b-47e0-a0be-65f1081a74f2,2.0
+Semester 1,907f0db2-3263-4612-a98d-5ad7d10f04f8,CDU,Chaitanya Deemed-to-be University,Web Application Development 1,Web Application Development 1,6d41f350-76d5-4337-9be0-3fe0b26b1b26,5.0
+Semester 1,907f0db2-3263-4612-a98d-5ad7d10f04f8,CDU,Chaitanya Deemed-to-be University,Computer Programming,Computer Programming,c6008f8d-cd91-4843-bb3f-b75d4beca046,5.0
+Semester 1,907f0db2-3263-4612-a98d-5ad7d10f04f8,CDU,Chaitanya Deemed-to-be University,Mathematics for Computer Science,Mathematics for Computer Science,70850c6b-459c-4134-a16c-3e42d46eb794,3.0
+Semester 1,907f0db2-3263-4612-a98d-5ad7d10f04f8,CDU,Chaitanya Deemed-to-be University,Communicative English Foundation,Communicative English Foundation,f903dc8e-fe3f-4977-86ad-d72d7690d38d,2.0
+Semester 1,907f0db2-3263-4612-a98d-5ad7d10f04f8,CDU,Chaitanya Deemed-to-be University,Quantitative Aptitude,Quantitative Aptitude,97671af2-f44f-4eed-978c-d65d5c0c55c9,3.0
+Semester 1,907f0db2-3263-4612-a98d-5ad7d10f04f8,CDU,Chaitanya Deemed-to-be University,Introduction to Generative AI,Introduction to Generative AI,b9811b34-585b-47e0-a0be-65f1081a74f2,2.0
+Semester 1,907f0db2-3263-4612-a98d-5ad7d10f04f8,CDU,Chaitanya Deemed-to-be University,Applied Science / Basic Electrical Engineering,Compliance,25115bd4-28f8-403c-a320-116d96015af5,2.0
+Semester 1,3953321b-7214-4c08-a29c-abbf1984bbf0,ADYPU,A Dy Patil University,Web Application Development 1,Web Application Development 1,6d41f350-76d5-4337-9be0-3fe0b26b1b26,4.0
+Semester 1,3953321b-7214-4c08-a29c-abbf1984bbf0,ADYPU,A Dy Patil University,Computer Programming,Computer Programming,c6008f8d-cd91-4843-bb3f-b75d4beca046,4.0
+Semester 1,3953321b-7214-4c08-a29c-abbf1984bbf0,ADYPU,A Dy Patil University,Mathematics for Data Science - I,Mathematics for Computer Science,70850c6b-459c-4134-a16c-3e42d46eb794,4.0
+Semester 1,3953321b-7214-4c08-a29c-abbf1984bbf0,ADYPU,A Dy Patil University,Communicative English Foundation,Communicative English Foundation,f903dc8e-fe3f-4977-86ad-d72d7690d38d,2.0
+Semester 1,3953321b-7214-4c08-a29c-abbf1984bbf0,ADYPU,A Dy Patil University,Quantitative Aptitude,Quantitative Aptitude,97671af2-f44f-4eed-978c-d65d5c0c55c9,0.0
+Semester 1,3953321b-7214-4c08-a29c-abbf1984bbf0,ADYPU,A Dy Patil University,Workshop Technology (Introduction to Generative AI),Introduction to Generative AI,b9811b34-585b-47e0-a0be-65f1081a74f2,2.0
+Semester 1,3953321b-7214-4c08-a29c-abbf1984bbf0,ADYPU,A Dy Patil University,Applied Physics for Data Science,Compliance,81f0b30e-5a5e-4df0-bd19-13cd70961bd5,4.0
+Semester 1,3953321b-7214-4c08-a29c-abbf1984bbf0,ADYPU,A Dy Patil University,Co-curricular Activities - I,Compliance,,2.0
+Semester 1,2f9f0fae-a892-4e68-846b-f86dd0802c72,Annamacharya,Annamacharya University,Web Application Development 1,Web Application Development 1,6d41f350-76d5-4337-9be0-3fe0b26b1b26,6.0
+Semester 1,2f9f0fae-a892-4e68-846b-f86dd0802c72,Annamacharya,Annamacharya University,Computer Programming,Computer Programming,c6008f8d-cd91-4843-bb3f-b75d4beca046,6.0
+Semester 1,2f9f0fae-a892-4e68-846b-f86dd0802c72,Annamacharya,Annamacharya University,Mathematics for Computer Science,Mathematics for Computer Science,70850c6b-459c-4134-a16c-3e42d46eb794,3.0
+Semester 1,2f9f0fae-a892-4e68-846b-f86dd0802c72,Annamacharya,Annamacharya University,Communicative English Foundation,Communicative English Foundation,f903dc8e-fe3f-4977-86ad-d72d7690d38d,2.0
+Semester 1,2f9f0fae-a892-4e68-846b-f86dd0802c72,Annamacharya,Annamacharya University,Quantitative Aptitude,Quantitative Aptitude,97671af2-f44f-4eed-978c-d65d5c0c55c9,2.0
+Semester 1,2f9f0fae-a892-4e68-846b-f86dd0802c72,Annamacharya,Annamacharya University,Introduction to Generative AI,Introduction to Generative AI,b9811b34-585b-47e0-a0be-65f1081a74f2,2.0
+Semester 1,a2c7e1f6-e27f-49aa-9185-a2a671d0a1f0,S Vyasa,S-VYASA,Web Technologies,Web Application Development 1,6d41f350-76d5-4337-9be0-3fe0b26b1b26,4.0
+Semester 1,a2c7e1f6-e27f-49aa-9185-a2a671d0a1f0,S Vyasa,S-VYASA,Problem Solving Using Programming I,Computer Programming,c6008f8d-cd91-4843-bb3f-b75d4beca046,5.0
+Semester 1,a2c7e1f6-e27f-49aa-9185-a2a671d0a1f0,S Vyasa,S-VYASA,Engineering Mathematics 1,Mathematics for Computer Science,70850c6b-459c-4134-a16c-3e42d46eb794,3.0
+Semester 1,a2c7e1f6-e27f-49aa-9185-a2a671d0a1f0,S Vyasa,S-VYASA,Basic Tehnical English,Communicative English Foundation,f903dc8e-fe3f-4977-86ad-d72d7690d38d,2.0
+Semester 1,a2c7e1f6-e27f-49aa-9185-a2a671d0a1f0,S Vyasa,S-VYASA,Quantitative Aptitude,Quantitative Aptitude,97671af2-f44f-4eed-978c-d65d5c0c55c9,3.0
+Semester 1,a2c7e1f6-e27f-49aa-9185-a2a671d0a1f0,S Vyasa,S-VYASA,Introduction to Generative AI,Introduction to Generative AI,b9811b34-585b-47e0-a0be-65f1081a74f2,2.0
+Semester 1,a2c7e1f6-e27f-49aa-9185-a2a671d0a1f0,S Vyasa,S-VYASA,Essence of Yoga: Principles and Practical Applications,Compliance,,3.0
+Semester 1,a2c7e1f6-e27f-49aa-9185-a2a671d0a1f0,S Vyasa,S-VYASA,UHV2,Compliance,,3.0
+Semester 1,afad4c88-97cc-4af3-bb18-6b5ab2c746d0,VGU,Vivekananda global University,Web Application Development 1,Web Application Development 1,6d41f350-76d5-4337-9be0-3fe0b26b1b26,4.0
+Semester 1,afad4c88-97cc-4af3-bb18-6b5ab2c746d0,VGU,Vivekananda global University,Computer Programming,Computer Programming,c6008f8d-cd91-4843-bb3f-b75d4beca046,4.0
+Semester 1,afad4c88-97cc-4af3-bb18-6b5ab2c746d0,VGU,Vivekananda global University,Mathematics for Computer Science,Mathematics for Computer Science,70850c6b-459c-4134-a16c-3e42d46eb794,3.0
+Semester 1,afad4c88-97cc-4af3-bb18-6b5ab2c746d0,VGU,Vivekananda global University,Communicative English Foundation,Communicative English Foundation,f903dc8e-fe3f-4977-86ad-d72d7690d38d,2.0
+Semester 1,afad4c88-97cc-4af3-bb18-6b5ab2c746d0,VGU,Vivekananda global University,Quantitative Aptitude,Quantitative Aptitude,97671af2-f44f-4eed-978c-d65d5c0c55c9,3.0
+Semester 1,afad4c88-97cc-4af3-bb18-6b5ab2c746d0,VGU,Vivekananda global University,Introduction to Generative AI,Introduction to Generative AI,b9811b34-585b-47e0-a0be-65f1081a74f2,2.0
+Semester 1,afad4c88-97cc-4af3-bb18-6b5ab2c746d0,VGU,Vivekananda global University,Applied Physics,Compliance,ff5ee4bb-c63b-4ee5-8113-52c4f382af6f,4.0
+Semester 1,afad4c88-97cc-4af3-bb18-6b5ab2c746d0,VGU,Vivekananda global University,Trans- disciplinary Project,Compliance,,1.0
+Semester 1,065bb7bf-99a6-4151-86e4-96e700ecb9b4,NRI,NRI,Web Application Development 1,Web Application Development 1,6d41f350-76d5-4337-9be0-3fe0b26b1b26,5.0
+Semester 1,065bb7bf-99a6-4151-86e4-96e700ecb9b4,NRI,NRI,Computer Programming,Computer Programming,c6008f8d-cd91-4843-bb3f-b75d4beca046,6.0
+Semester 1,065bb7bf-99a6-4151-86e4-96e700ecb9b4,NRI,NRI,Mathematics for Computer Science,Mathematics for Computer Science,70850c6b-459c-4134-a16c-3e42d46eb794,4.0
+Semester 1,065bb7bf-99a6-4151-86e4-96e700ecb9b4,NRI,NRI,Communicative English Foundation,Communicative English Foundation,f903dc8e-fe3f-4977-86ad-d72d7690d38d,2.0
+Semester 1,065bb7bf-99a6-4151-86e4-96e700ecb9b4,NRI,NRI,Logical Mathematics For Software Engineers I,Quantitative Aptitude,97671af2-f44f-4eed-978c-d65d5c0c55c9,2.0
+Semester 1,065bb7bf-99a6-4151-86e4-96e700ecb9b4,NRI,NRI,Introduction to Generative AI,Introduction to Generative AI,b9811b34-585b-47e0-a0be-65f1081a74f2,3.0
+Semester 1,4c3ccc5b-89d9-48c0-b079-61318208353f,NSRIT,NSRIT University,Web Application Development 1,Web Application Development 1,6d41f350-76d5-4337-9be0-3fe0b26b1b26,5.0
+Semester 1,4c3ccc5b-89d9-48c0-b079-61318208353f,NSRIT,NSRIT University,Computer Programming,Computer Programming,c6008f8d-cd91-4843-bb3f-b75d4beca046,6.0
+Semester 1,4c3ccc5b-89d9-48c0-b079-61318208353f,NSRIT,NSRIT University,Mathematics for Computer Science,Mathematics for Computer Science,70850c6b-459c-4134-a16c-3e42d46eb794,3.0
+Semester 1,4c3ccc5b-89d9-48c0-b079-61318208353f,NSRIT,NSRIT University,Communicative English Foundation,Communicative English Foundation,f903dc8e-fe3f-4977-86ad-d72d7690d38d,2.0
+Semester 1,4c3ccc5b-89d9-48c0-b079-61318208353f,NSRIT,NSRIT University,Quantitative Aptitude,Quantitative Aptitude,97671af2-f44f-4eed-978c-d65d5c0c55c9,3.0
+Semester 1,4c3ccc5b-89d9-48c0-b079-61318208353f,NSRIT,NSRIT University,Introduction to Generative AI,Introduction to Generative AI,b9811b34-585b-47e0-a0be-65f1081a74f2,2.0
+Semester 1,4c3ccc5b-89d9-48c0-b079-61318208353f,NSRIT,NSRIT University,C Programming,Compliance,19290391-6d5c-4e08-a3f8-1303e8e2627f,4.0
+Semester 1,8960968b-4069-48f4-a769-b842ccb71247,Chalapathy,Chalapathy (CITY),Web Application Development 1,Web Application Development 1,6d41f350-76d5-4337-9be0-3fe0b26b1b26,5.0
+Semester 1,8960968b-4069-48f4-a769-b842ccb71247,Chalapathy,Chalapathy (CITY),Computer Programming,Computer Programming,c6008f8d-cd91-4843-bb3f-b75d4beca046,6.0
+Semester 1,8960968b-4069-48f4-a769-b842ccb71247,Chalapathy,Chalapathy (CITY),Mathematics for Computer Science,Mathematics for Computer Science,70850c6b-459c-4134-a16c-3e42d46eb794,3.0
+Semester 1,8960968b-4069-48f4-a769-b842ccb71247,Chalapathy,Chalapathy (CITY),Communicative English Foundation,Communicative English Foundation,f903dc8e-fe3f-4977-86ad-d72d7690d38d,2.0
+Semester 1,8960968b-4069-48f4-a769-b842ccb71247,Chalapathy,Chalapathy (CITY),Quantitative Aptitude,Quantitative Aptitude,97671af2-f44f-4eed-978c-d65d5c0c55c9,3.0
+Semester 1,8960968b-4069-48f4-a769-b842ccb71247,Chalapathy,Chalapathy (CITY),Introduction to Generative AI,Introduction to Generative AI,b9811b34-585b-47e0-a0be-65f1081a74f2,2.0
+Semester 1,8960968b-4069-48f4-a769-b842ccb71247,Chalapathy,Chalapathy (CITY),C Programming,Compliance,19290391-6d5c-4e08-a3f8-1303e8e2627f,4.0
+Semester 1,54e79af8-33e6-4a04-a65f-21099c19fb69,NIAT Chevella,NIAT Chevella,Web Application Development 1,Web Application Development 1,6d41f350-76d5-4337-9be0-3fe0b26b1b26,0.0
+Semester 1,54e79af8-33e6-4a04-a65f-21099c19fb69,NIAT Chevella,NIAT Chevella,Communicative English Foundation,Communicative English Foundation,f903dc8e-fe3f-4977-86ad-d72d7690d38d,0.0
+Semester 1,54e79af8-33e6-4a04-a65f-21099c19fb69,NIAT Chevella,NIAT Chevella,Quantitative Aptitude,Quantitative Aptitude,97671af2-f44f-4eed-978c-d65d5c0c55c9,0.0
+Semester 1,54e79af8-33e6-4a04-a65f-21099c19fb69,NIAT Chevella,NIAT Chevella,Introduction to Generative AI,Introduction to Generative AI,b9811b34-585b-47e0-a0be-65f1081a74f2,0.0
+Semester 1,54e79af8-33e6-4a04-a65f-21099c19fb69,NIAT Chevella,NIAT Chevella,Introduction to Programming,Computer Programming,c6008f8d-cd91-4843-bb3f-b75d4beca046,4.0
+Semester 1,54e79af8-33e6-4a04-a65f-21099c19fb69,NIAT Chevella,NIAT Chevella,Discrete Mathematics,Compliance,e613392b-47b5-45d6-97cc-e056d2d23ba0,2.0
+Semester 1,54e79af8-33e6-4a04-a65f-21099c19fb69,NIAT Chevella,NIAT Chevella,Writing Practice,Compliance,80c63772-2861-4bc0-8166-9b7c242494b2,2.0
+Semester 1,54e79af8-33e6-4a04-a65f-21099c19fb69,NIAT Chevella,NIAT Chevella,Linear Algebra and Optimaization,Compliance,60992737-4d71-4e0b-9427-d79ec266b8e1,4.0
+Semester 1,54e79af8-33e6-4a04-a65f-21099c19fb69,NIAT Chevella,NIAT Chevella,Basic Electronics,Compliance,a4ace619-8c54-4eb8-9a6e-1ddafd29cdc4,2.0
+Semester 1,54e79af8-33e6-4a04-a65f-21099c19fb69,NIAT Chevella,NIAT Chevella,Probability & Statistics,Compliance,26ff5df0-817b-45d0-8757-e5e632f7c755,4.0
+Semester 1,45f514dd-f612-4f4f-9d8a-b4b209523ab1,NIU,Noida International University,Web Application Development 1,Web Application Development 1,6d41f350-76d5-4337-9be0-3fe0b26b1b26,5.0
+Semester 1,45f514dd-f612-4f4f-9d8a-b4b209523ab1,NIU,Noida International University,Computer Programming,Computer Programming,c6008f8d-cd91-4843-bb3f-b75d4beca046,6.0
+Semester 1,45f514dd-f612-4f4f-9d8a-b4b209523ab1,NIU,Noida International University,Mathematics for Computer Science,Mathematics for Computer Science,70850c6b-459c-4134-a16c-3e42d46eb794,3.0
+Semester 1,45f514dd-f612-4f4f-9d8a-b4b209523ab1,NIU,Noida International University,Communicative English Foundation,Communicative English Foundation,f903dc8e-fe3f-4977-86ad-d72d7690d38d,2.0
+Semester 1,45f514dd-f612-4f4f-9d8a-b4b209523ab1,NIU,Noida International University,Quantitative Aptitude,Quantitative Aptitude,97671af2-f44f-4eed-978c-d65d5c0c55c9,3.0
+Semester 1,45f514dd-f612-4f4f-9d8a-b4b209523ab1,NIU,Noida International University,Introduction to Generative AI,Introduction to Generative AI,b9811b34-585b-47e0-a0be-65f1081a74f2,2.0
+Semester 1,09105c4a-966d-4f8f-bda5-337d233029ef,CRESCENT,Crescent University,Introduction to Web Technologies,Web Application Development 1,6d41f350-76d5-4337-9be0-3fe0b26b1b26,4.0
+Semester 1,09105c4a-966d-4f8f-bda5-337d233029ef,CRESCENT,Crescent University,Computer Programming,Computer Programming,c6008f8d-cd91-4843-bb3f-b75d4beca046,4.0
+Semester 1,09105c4a-966d-4f8f-bda5-337d233029ef,CRESCENT,Crescent University,Mathematics for Computing,Mathematics for Computer Science,babebdb0-592a-4eef-b605-4d897bc86aca,4.0
+Semester 1,09105c4a-966d-4f8f-bda5-337d233029ef,CRESCENT,Crescent University,Communicative English Foundation,Communicative English Foundation,f903dc8e-fe3f-4977-86ad-d72d7690d38d,2.0
+Semester 1,09105c4a-966d-4f8f-bda5-337d233029ef,CRESCENT,Crescent University,Basic Electrical & Electronics Engineering,Compliance,,3.0
+Semester 1,09105c4a-966d-4f8f-bda5-337d233029ef,CRESCENT,Crescent University,Engineering Graphics,Compliance,,3.0
+Semester 1,09105c4a-966d-4f8f-bda5-337d233029ef,CRESCENT,Crescent University,MNC – I (EVS) *,Compliance,,0.0
+Semester 1,1ec07200-92a5-4a11-a542-4eb95b951a04,Takshashila,Takshasila University,Web Application Development I,Web Application Development 1,6d41f350-76d5-4337-9be0-3fe0b26b1b26,4.0
+Semester 1,1ec07200-92a5-4a11-a542-4eb95b951a04,Takshashila,Takshasila University,Computer Programming,Computer Programming,c6008f8d-cd91-4843-bb3f-b75d4beca046,4.0
+Semester 1,1ec07200-92a5-4a11-a542-4eb95b951a04,Takshashila,Takshasila University,Mathematics for Computer Science,Mathematics for Computer Science,70850c6b-459c-4134-a16c-3e42d46eb794,4.0
+Semester 1,1ec07200-92a5-4a11-a542-4eb95b951a04,Takshashila,Takshasila University,Communicative English Foundation,Communicative English Foundation,f903dc8e-fe3f-4977-86ad-d72d7690d38d,3.0
+Semester 1,1ec07200-92a5-4a11-a542-4eb95b951a04,Takshashila,Takshasila University,Quantitative Aptitude,Quantitative Aptitude,97671af2-f44f-4eed-978c-d65d5c0c55c9,3.0
+Semester 1,1ec07200-92a5-4a11-a542-4eb95b951a04,Takshashila,Takshasila University,Introduction to Generative AI,Introduction to Generative AI,b9811b34-585b-47e0-a0be-65f1081a74f2,3.0
+Semester 1,1ec07200-92a5-4a11-a542-4eb95b951a04,Takshashila,Takshasila University,Physical Wellness and Yoga,Compliance,,1.0
+Semester 1,55d2a06b-c0cf-4920-b4ce-40850cab237f,AMET,AMET,Web Application Development 1,Web Application Development 1,6d41f350-76d5-4337-9be0-3fe0b26b1b26,5.0
+Semester 1,55d2a06b-c0cf-4920-b4ce-40850cab237f,AMET,AMET,Computer Programming,Computer Programming,c6008f8d-cd91-4843-bb3f-b75d4beca046,6.0
+Semester 1,55d2a06b-c0cf-4920-b4ce-40850cab237f,AMET,AMET,Mathematics for Computer Science,Mathematics for Computer Science,70850c6b-459c-4134-a16c-3e42d46eb794,3.0
+Semester 1,55d2a06b-c0cf-4920-b4ce-40850cab237f,AMET,AMET,Communicative English Foundation,Communicative English Foundation,f903dc8e-fe3f-4977-86ad-d72d7690d38d,2.0
+Semester 1,55d2a06b-c0cf-4920-b4ce-40850cab237f,AMET,AMET,Quantitative Aptitude,Quantitative Aptitude,97671af2-f44f-4eed-978c-d65d5c0c55c9,3.0
+Semester 1,55d2a06b-c0cf-4920-b4ce-40850cab237f,AMET,AMET,Introduction to Generative AI,Introduction to Generative AI,b9811b34-585b-47e0-a0be-65f1081a74f2,3.0
+Semester 1,4497920d-7f75-4a6c-a913-c8c1c234d5d3,AURORA,Aurora University,Fundamentals of Web Development,Web Application Development 1,6d41f350-76d5-4337-9be0-3fe0b26b1b26,4.0
+Semester 1,4497920d-7f75-4a6c-a913-c8c1c234d5d3,AURORA,Aurora University,Frontend Development Fundamentals,Web Application Development 1,c0d9b357-87a7-41e2-985f-affaef636499,4.0
+Semester 1,4497920d-7f75-4a6c-a913-c8c1c234d5d3,AURORA,Aurora University,Problem Solving With Python Programming-1,Computer Programming,b76ff0b8-3180-494f-a9a8-0e89c56421b1,4.0
+Semester 1,4497920d-7f75-4a6c-a913-c8c1c234d5d3,AURORA,Aurora University,Problem Solving With Python Programming-2,Computer Programming,156a0835-8489-4229-a1bb-b8a518ce33fa,4.0
+Semester 1,4497920d-7f75-4a6c-a913-c8c1c234d5d3,AURORA,Aurora University,Mathematics for Computer Science,Mathematics for Computer Science,db423418-ce78-49d2-b082-edf9fa1173fc,4.0
+Semester 1,4497920d-7f75-4a6c-a913-c8c1c234d5d3,AURORA,Aurora University,Calculus and Differential Equations,Mathematics for Computer Science,7b362dbb-d03a-40dc-8276-8fadb82bf100,4.0
+Semester 1,4497920d-7f75-4a6c-a913-c8c1c234d5d3,AURORA,Aurora University,Cambridge English B1,Communicative English Foundation,76993b17-92e1-44b3-b7d9-4c09ce888ce6,1.0
+Semester 1,4497920d-7f75-4a6c-a913-c8c1c234d5d3,AURORA,Aurora University,Quantitative Aptitude,Quantitative Aptitude,97671af2-f44f-4eed-978c-d65d5c0c55c9,0.0
+Semester 1,4497920d-7f75-4a6c-a913-c8c1c234d5d3,AURORA,Aurora University,Introduction to Generative AI,Introduction to Generative AI,b9811b34-585b-47e0-a0be-65f1081a74f2,0.0
+Semester 1,4497920d-7f75-4a6c-a913-c8c1c234d5d3,AURORA,Aurora University,Engineering Physics,Compliance,4e7a00c7-c332-4269-9641-05faea2995d0,4.0
+Semester 1,4497920d-7f75-4a6c-a913-c8c1c234d5d3,AURORA,Aurora University,Engineering Chemistry,Compliance,e2258ad7-52aa-4ed8-9653-6ed221089abd,4.0
+Semester 1,4497920d-7f75-4a6c-a913-c8c1c234d5d3,AURORA,Aurora University,Design Drafting,Compliance,80eeab06-4258-4e87-ad27-cf8ee362edb8,2.0
+Semester 2,e593b081-bebe-450a-b433-8f942ab87686,MRV,Malla Reddy Vishwavidyapeeth,Web Application Development - II,Web Application Development 2,7e0446da-981d-4faa-b02d-f4dc605dba66,5.0
+Semester 2,e593b081-bebe-450a-b433-8f942ab87686,MRV,Malla Reddy Vishwavidyapeeth,Database Management Systems,Database Management Systems,25c1a72c-216e-47e1-9bc6-b2f16c66e0ca,4.0
+Semester 2,e593b081-bebe-450a-b433-8f942ab87686,MRV,Malla Reddy Vishwavidyapeeth,Data Structures,Data Structures,e216af3e-bcd0-4dee-9c4f-67e7502ecba3,5.0
+Semester 2,e593b081-bebe-450a-b433-8f942ab87686,MRV,Malla Reddy Vishwavidyapeeth,Mathematics for Problem Solving,Numerical Ability,0bbea1fb-25bc-402d-b0d4-72112198d5da,3.0
+Semester 2,e593b081-bebe-450a-b433-8f942ab87686,MRV,Malla Reddy Vishwavidyapeeth,Technical Communication for Engineers,Communicative English Advanced,b21fe64c-21dc-4d6b-bd20-eceb953dd154,2.0
+Semester 2,e593b081-bebe-450a-b433-8f942ab87686,MRV,Malla Reddy Vishwavidyapeeth,Foreign Language-2,Complaince,c50fb2bf-d957-4888-9a59-1e71a7ec09d7,0.0
+Semester 2,e593b081-bebe-450a-b433-8f942ab87686,MRV,Malla Reddy Vishwavidyapeeth,Universal Human Values,Complaince,7090775e-6fa5-40c1-bdcd-3098d3078706,2.0
+Semester 2,e593b081-bebe-450a-b433-8f942ab87686,MRV,Malla Reddy Vishwavidyapeeth,Fundamentals of Quantum Computing,Complaince,746ffae9-adee-45d3-8716-bc0cf07bc264,2.0
+Semester 2,e593b081-bebe-450a-b433-8f942ab87686,MRV,Malla Reddy Vishwavidyapeeth,Computer Aided Engineering Graphics,Complaince,a2e3e612-2f54-4b74-8a7c-1e3c6251fc1c,2.0
+Semester 2,e593b081-bebe-450a-b433-8f942ab87686,MRV,Malla Reddy Vishwavidyapeeth,Building LLM Applications,Building LLM Applications,a8f81e0c-22c3-41e6-b98a-ce7552d8e2c7,0.0
+Semester 2,4134c4fe-97a2-4846-b95f-bd9b51d854d7,Yenepoya,Yenapoya University,Web Application Development 2,Web Application Development 2,7e0446da-981d-4faa-b02d-f4dc605dba66,4.0
+Semester 2,4134c4fe-97a2-4846-b95f-bd9b51d854d7,Yenepoya,Yenapoya University,Database Management Systems,Database Management Systems,25c1a72c-216e-47e1-9bc6-b2f16c66e0ca,4.0
+Semester 2,4134c4fe-97a2-4846-b95f-bd9b51d854d7,Yenepoya,Yenapoya University,Data Structures,Data Structures,e216af3e-bcd0-4dee-9c4f-67e7502ecba3,6.0
+Semester 2,4134c4fe-97a2-4846-b95f-bd9b51d854d7,Yenepoya,Yenapoya University,Numerical Ability,Numerical Ability,3525d39d-b705-45a1-ac24-67291bf35bd6,0.0
+Semester 2,4134c4fe-97a2-4846-b95f-bd9b51d854d7,Yenepoya,Yenapoya University,Communicative English Advanced,Communicative English Advanced,bfd0a2ef-eb93-4e4b-bc1c-9acac895d6a4,2.0
+Semester 2,4134c4fe-97a2-4846-b95f-bd9b51d854d7,Yenepoya,Yenapoya University,Building LLM Applications,Building LLM Applications,a8f81e0c-22c3-41e6-b98a-ce7552d8e2c7,0.0
+Semester 2,4134c4fe-97a2-4846-b95f-bd9b51d854d7,Yenepoya,Yenapoya University,Environmental Studies,Complaince,,0.0
+Semester 2,4134c4fe-97a2-4846-b95f-bd9b51d854d7,Yenepoya,Yenapoya University,Engineering Physics,Complaince,,2.0
+Semester 2,4134c4fe-97a2-4846-b95f-bd9b51d854d7,Yenepoya,Yenapoya University,Material Chemistry for CSE,Complaince,,2.0
+Semester 2,8170360b-24f7-45b1-8f25-5733893ebdda,SGU,Sanjay Ghodawat University,Web Application Development II,Web Application Development 2,7e0446da-981d-4faa-b02d-f4dc605dba66,4.0
+Semester 2,8170360b-24f7-45b1-8f25-5733893ebdda,SGU,Sanjay Ghodawat University,Database Management Systems,Database Management Systems,25c1a72c-216e-47e1-9bc6-b2f16c66e0ca,4.0
+Semester 2,8170360b-24f7-45b1-8f25-5733893ebdda,SGU,Sanjay Ghodawat University,Data Structures,Data Structures,e216af3e-bcd0-4dee-9c4f-67e7502ecba3,6.0
+Semester 2,8170360b-24f7-45b1-8f25-5733893ebdda,SGU,Sanjay Ghodawat University,Numerical Ability,Numerical Ability,3525d39d-b705-45a1-ac24-67291bf35bd6,2.0
+Semester 2,8170360b-24f7-45b1-8f25-5733893ebdda,SGU,Sanjay Ghodawat University,Communicative English Advanced,Communicative English Advanced,bfd0a2ef-eb93-4e4b-bc1c-9acac895d6a4,2.0
+Semester 2,8170360b-24f7-45b1-8f25-5733893ebdda,SGU,Sanjay Ghodawat University,Building LLM Applications,Building LLM Applications,a8f81e0c-22c3-41e6-b98a-ce7552d8e2c7,2.0
+Semester 2,8170360b-24f7-45b1-8f25-5733893ebdda,SGU,Sanjay Ghodawat University,Modern Physics,Complaince,,2.0
+Semester 2,907f0db2-3263-4612-a98d-5ad7d10f04f8,CDU,Chaitanya Deemed-to-be University,Web Application Development 2,Web Application Development 2,7e0446da-981d-4faa-b02d-f4dc605dba66,4.0
+Semester 2,907f0db2-3263-4612-a98d-5ad7d10f04f8,CDU,Chaitanya Deemed-to-be University,Database Management Systems,Database Management Systems,25c1a72c-216e-47e1-9bc6-b2f16c66e0ca,4.0
+Semester 2,907f0db2-3263-4612-a98d-5ad7d10f04f8,CDU,Chaitanya Deemed-to-be University,Data Structures,Data Structures,e216af3e-bcd0-4dee-9c4f-67e7502ecba3,5.0
+Semester 2,907f0db2-3263-4612-a98d-5ad7d10f04f8,CDU,Chaitanya Deemed-to-be University,Numerical Ability,Numerical Ability,3525d39d-b705-45a1-ac24-67291bf35bd6,3.0
+Semester 2,907f0db2-3263-4612-a98d-5ad7d10f04f8,CDU,Chaitanya Deemed-to-be University,Communicative English Advanced,Communicative English Advanced,bfd0a2ef-eb93-4e4b-bc1c-9acac895d6a4,2.0
+Semester 2,907f0db2-3263-4612-a98d-5ad7d10f04f8,CDU,Chaitanya Deemed-to-be University,Building LLM Applications,Building LLM Applications,a8f81e0c-22c3-41e6-b98a-ce7552d8e2c7,2.0
+Semester 2,907f0db2-3263-4612-a98d-5ad7d10f04f8,CDU,Chaitanya Deemed-to-be University,Applied Science / Basic Electrical Engineering,Complaince,,2.0
+Semester 2,3953321b-7214-4c08-a29c-abbf1984bbf0,ADYPU,A Dy Patil University,Web Application Development II,Web Application Development 2,7e0446da-981d-4faa-b02d-f4dc605dba66,4.0
+Semester 2,3953321b-7214-4c08-a29c-abbf1984bbf0,ADYPU,A Dy Patil University,Introduction Database Management Systems,Database Management Systems,25c1a72c-216e-47e1-9bc6-b2f16c66e0ca,4.0
+Semester 2,3953321b-7214-4c08-a29c-abbf1984bbf0,ADYPU,A Dy Patil University,Data Structures,Data Structures,e216af3e-bcd0-4dee-9c4f-67e7502ecba3,4.0
+Semester 2,3953321b-7214-4c08-a29c-abbf1984bbf0,ADYPU,A Dy Patil University,Numerical Ability,Numerical Ability,3525d39d-b705-45a1-ac24-67291bf35bd6,0.0
+Semester 2,3953321b-7214-4c08-a29c-abbf1984bbf0,ADYPU,A Dy Patil University,Communicative English Advanced,Communicative English Advanced,bfd0a2ef-eb93-4e4b-bc1c-9acac895d6a4,0.0
+Semester 2,3953321b-7214-4c08-a29c-abbf1984bbf0,ADYPU,A Dy Patil University,Building LLM Applications,Building LLM Applications,a8f81e0c-22c3-41e6-b98a-ce7552d8e2c7,2.0
+Semester 2,3953321b-7214-4c08-a29c-abbf1984bbf0,ADYPU,A Dy Patil University,Linear Algebra and Calculus,Complaince,ce546ef7-181e-427c-b2b7-79492736e578,4.0
+Semester 2,3953321b-7214-4c08-a29c-abbf1984bbf0,ADYPU,A Dy Patil University,Indian Knowledge Systems,Complaince,27ea918a-df83-4500-98d8-fe137323ef63,2.0
+Semester 2,3953321b-7214-4c08-a29c-abbf1984bbf0,ADYPU,A Dy Patil University,Engineering Drawing,Complaince,80eeab06-4258-4e87-ad27-cf8ee362edb8,0.0
+Semester 2,3953321b-7214-4c08-a29c-abbf1984bbf0,ADYPU,A Dy Patil University,Co-curricular Activities - 2,Complaince,,2.0
+Semester 2,2f9f0fae-a892-4e68-846b-f86dd0802c72,Annamacharya,Annamacharya University,Web Application Development 2,Web Application Development 2,7e0446da-981d-4faa-b02d-f4dc605dba66,4.0
+Semester 2,2f9f0fae-a892-4e68-846b-f86dd0802c72,Annamacharya,Annamacharya University,Database Management Systems,Database Management Systems,25c1a72c-216e-47e1-9bc6-b2f16c66e0ca,4.0
+Semester 2,2f9f0fae-a892-4e68-846b-f86dd0802c72,Annamacharya,Annamacharya University,Data Structures,Data Structures,e216af3e-bcd0-4dee-9c4f-67e7502ecba3,6.0
+Semester 2,2f9f0fae-a892-4e68-846b-f86dd0802c72,Annamacharya,Annamacharya University,Numerical Ability,Numerical Ability,3525d39d-b705-45a1-ac24-67291bf35bd6,3.0
+Semester 2,2f9f0fae-a892-4e68-846b-f86dd0802c72,Annamacharya,Annamacharya University,Communicative English Advanced,Communicative English Advanced,b21fe64c-21dc-4d6b-bd20-eceb953dd154,2.0
+Semester 2,2f9f0fae-a892-4e68-846b-f86dd0802c72,Annamacharya,Annamacharya University,Building LLM Applications,Building LLM Applications,a8f81e0c-22c3-41e6-b98a-ce7552d8e2c7,2.0
+Semester 2,2f9f0fae-a892-4e68-846b-f86dd0802c72,Annamacharya,Annamacharya University,Environmental Sciences,Complaince,a84c404d-473d-49a8-850f-38e7ae077e13,1.0
+Semester 2,a2c7e1f6-e27f-49aa-9185-a2a671d0a1f0,S Vyasa,S-VYASA,Front End Full Stack Development,Web Application Development 2,7e0446da-981d-4faa-b02d-f4dc605dba66,4.0
+Semester 2,a2c7e1f6-e27f-49aa-9185-a2a671d0a1f0,S Vyasa,S-VYASA,Database Management System,Database Management Systems,25c1a72c-216e-47e1-9bc6-b2f16c66e0ca,4.0
+Semester 2,a2c7e1f6-e27f-49aa-9185-a2a671d0a1f0,S Vyasa,S-VYASA,Datastructures and AI,Data Structures,e216af3e-bcd0-4dee-9c4f-67e7502ecba3,6.0
+Semester 2,a2c7e1f6-e27f-49aa-9185-a2a671d0a1f0,S Vyasa,S-VYASA,Engineering Mathematics 2,Numerical Ability,3525d39d-b705-45a1-ac24-67291bf35bd6,3.0
+Semester 2,a2c7e1f6-e27f-49aa-9185-a2a671d0a1f0,S Vyasa,S-VYASA,Advanced Technical English,Communicative English Advanced,b21fe64c-21dc-4d6b-bd20-eceb953dd154,2.0
+Semester 2,a2c7e1f6-e27f-49aa-9185-a2a671d0a1f0,S Vyasa,S-VYASA,Building LLM Applications,Building LLM Applications,a8f81e0c-22c3-41e6-b98a-ce7552d8e2c7,2.0
+Semester 2,a2c7e1f6-e27f-49aa-9185-a2a671d0a1f0,S Vyasa,S-VYASA,Constitution of India,Complaince,,0.0
+Semester 2,a2c7e1f6-e27f-49aa-9185-a2a671d0a1f0,S Vyasa,S-VYASA,Application of yoga in mind body management,Complaince,,3.0
+Semester 2,afad4c88-97cc-4af3-bb18-6b5ab2c746d0,VGU,Vivekananda global University,Web Application Development 2,Web Application Development 2,7e0446da-981d-4faa-b02d-f4dc605dba66,4.0
+Semester 2,afad4c88-97cc-4af3-bb18-6b5ab2c746d0,VGU,Vivekananda global University,Introduction to DataBase,Database Management Systems,25c1a72c-216e-47e1-9bc6-b2f16c66e0ca,4.0
+Semester 2,afad4c88-97cc-4af3-bb18-6b5ab2c746d0,VGU,Vivekananda global University,Data Structures Using C++,Data Structures,e216af3e-bcd0-4dee-9c4f-67e7502ecba3,4.0
+Semester 2,afad4c88-97cc-4af3-bb18-6b5ab2c746d0,VGU,Vivekananda global University,Skill Enhancement Courses,Numerical Ability,3525d39d-b705-45a1-ac24-67291bf35bd6,3.0
+Semester 2,afad4c88-97cc-4af3-bb18-6b5ab2c746d0,VGU,Vivekananda global University,Ability  Enhancement Course,Communicative English Advanced,b21fe64c-21dc-4d6b-bd20-eceb953dd154,2.0
+Semester 2,afad4c88-97cc-4af3-bb18-6b5ab2c746d0,VGU,Vivekananda global University,Value Added Course,Building LLM Applications,a8f81e0c-22c3-41e6-b98a-ce7552d8e2c7,2.0
+Semester 2,afad4c88-97cc-4af3-bb18-6b5ab2c746d0,VGU,Vivekananda global University,Trans- disciplinary,Complaince,,1.0
+Semester 2,065bb7bf-99a6-4151-86e4-96e700ecb9b4,NRI,NRI,Web Application Development 2,Web Application Development 2,7e0446da-981d-4faa-b02d-f4dc605dba66,5.0
+Semester 2,065bb7bf-99a6-4151-86e4-96e700ecb9b4,NRI,NRI,Database Management Systems,Database Management Systems,25c1a72c-216e-47e1-9bc6-b2f16c66e0ca,4.0
+Semester 2,065bb7bf-99a6-4151-86e4-96e700ecb9b4,NRI,NRI,Data Structures,Data Structures,e216af3e-bcd0-4dee-9c4f-67e7502ecba3,5.0
+Semester 2,065bb7bf-99a6-4151-86e4-96e700ecb9b4,NRI,NRI,Logical Mathematics For Software Engineers II,Numerical Ability,3525d39d-b705-45a1-ac24-67291bf35bd6,2.0
+Semester 2,065bb7bf-99a6-4151-86e4-96e700ecb9b4,NRI,NRI,Communicative English Advanced,Communicative English Advanced,b21fe64c-21dc-4d6b-bd20-eceb953dd154,2.0
+Semester 2,065bb7bf-99a6-4151-86e4-96e700ecb9b4,NRI,NRI,Building LLM Applications,Building LLM Applications,a8f81e0c-22c3-41e6-b98a-ce7552d8e2c7,2.0
+Semester 2,065bb7bf-99a6-4151-86e4-96e700ecb9b4,NRI,NRI,Environmental Science,Complaince,,0.0
+Semester 2,4c3ccc5b-89d9-48c0-b079-61318208353f,NSRIT,NSRIT University,Web Application Development 2,Web Application Development 2,7e0446da-981d-4faa-b02d-f4dc605dba66,4.0
+Semester 2,4c3ccc5b-89d9-48c0-b079-61318208353f,NSRIT,NSRIT University,Database Management Systems,Database Management Systems,25c1a72c-216e-47e1-9bc6-b2f16c66e0ca,4.0
+Semester 2,4c3ccc5b-89d9-48c0-b079-61318208353f,NSRIT,NSRIT University,Data Structures,Data Structures,e216af3e-bcd0-4dee-9c4f-67e7502ecba3,6.0
+Semester 2,4c3ccc5b-89d9-48c0-b079-61318208353f,NSRIT,NSRIT University,Numerical Ability,Numerical Ability,0bbea1fb-25bc-402d-b0d4-72112198d5da,3.0
+Semester 2,4c3ccc5b-89d9-48c0-b079-61318208353f,NSRIT,NSRIT University,Communicative English Advanced,Communicative English Advanced,b21fe64c-21dc-4d6b-bd20-eceb953dd154,2.0
+Semester 2,4c3ccc5b-89d9-48c0-b079-61318208353f,NSRIT,NSRIT University,Building LLM Applications,Building LLM Applications,a8f81e0c-22c3-41e6-b98a-ce7552d8e2c7,2.0
+Semester 2,8960968b-4069-48f4-a769-b842ccb71247,Chalapathy,Chalapathy (CITY),Web Application Development 2,Web Application Development 2,7e0446da-981d-4faa-b02d-f4dc605dba66,4.0
+Semester 2,8960968b-4069-48f4-a769-b842ccb71247,Chalapathy,Chalapathy (CITY),Database Management Systems,Database Management Systems,25c1a72c-216e-47e1-9bc6-b2f16c66e0ca,4.0
+Semester 2,8960968b-4069-48f4-a769-b842ccb71247,Chalapathy,Chalapathy (CITY),Data Structures,Data Structures,e216af3e-bcd0-4dee-9c4f-67e7502ecba3,6.0
+Semester 2,8960968b-4069-48f4-a769-b842ccb71247,Chalapathy,Chalapathy (CITY),Numerical Ability,Numerical Ability,0bbea1fb-25bc-402d-b0d4-72112198d5da,3.0
+Semester 2,8960968b-4069-48f4-a769-b842ccb71247,Chalapathy,Chalapathy (CITY),Communicative English Advanced,Communicative English Advanced,b21fe64c-21dc-4d6b-bd20-eceb953dd154,2.0
+Semester 2,8960968b-4069-48f4-a769-b842ccb71247,Chalapathy,Chalapathy (CITY),Building LLM Applications,Building LLM Applications,a8f81e0c-22c3-41e6-b98a-ce7552d8e2c7,2.0
+Semester 2,54e79af8-33e6-4a04-a65f-21099c19fb69,NIAT Chevella,NIAT Chevella,Web Application Development 2,Web Application Development 2,7e0446da-981d-4faa-b02d-f4dc605dba66,4.0
+Semester 2,54e79af8-33e6-4a04-a65f-21099c19fb69,NIAT Chevella,NIAT Chevella,Database Management Systems,Database Management Systems,25c1a72c-216e-47e1-9bc6-b2f16c66e0ca,4.0
+Semester 2,54e79af8-33e6-4a04-a65f-21099c19fb69,NIAT Chevella,NIAT Chevella,Data Structures,Data Structures,e216af3e-bcd0-4dee-9c4f-67e7502ecba3,6.0
+Semester 2,54e79af8-33e6-4a04-a65f-21099c19fb69,NIAT Chevella,NIAT Chevella,Numerical Ability,Numerical Ability,3525d39d-b705-45a1-ac24-67291bf35bd6,3.0
+Semester 2,54e79af8-33e6-4a04-a65f-21099c19fb69,NIAT Chevella,NIAT Chevella,Communicative English Advanced,Communicative English Advanced,bfd0a2ef-eb93-4e4b-bc1c-9acac895d6a4,2.0
+Semester 2,54e79af8-33e6-4a04-a65f-21099c19fb69,NIAT Chevella,NIAT Chevella,Building LLM Applications,Building LLM Applications,a8f81e0c-22c3-41e6-b98a-ce7552d8e2c7,2.0
+Semester 2,54e79af8-33e6-4a04-a65f-21099c19fb69,NIAT Chevella,NIAT Chevella,Introduction to Computing Systems,Compliance,8dd432a6-5c40-4c24-a6db-7e0dccbb6b90,2.0
+Semester 2,54e79af8-33e6-4a04-a65f-21099c19fb69,NIAT Chevella,NIAT Chevella,Introduction to logic,Compliance,7570806b-2dfa-4951-b114-0ac873e927e3,2.0
+Semester 2,54e79af8-33e6-4a04-a65f-21099c19fb69,NIAT Chevella,NIAT Chevella,Object oriented programming,Compliance,d8be8ef4-a527-4f20-82a9-15d0adc99930,2.0
+Semester 2,45f514dd-f612-4f4f-9d8a-b4b209523ab1,NIU,Noida International University,Web Application Development 2,Web Application Development 2,7e0446da-981d-4faa-b02d-f4dc605dba66,4.0
+Semester 2,45f514dd-f612-4f4f-9d8a-b4b209523ab1,NIU,Noida International University,Database Management Systems,Database Management Systems,25c1a72c-216e-47e1-9bc6-b2f16c66e0ca,4.0
+Semester 2,45f514dd-f612-4f4f-9d8a-b4b209523ab1,NIU,Noida International University,Data Structures,Data Structures,e216af3e-bcd0-4dee-9c4f-67e7502ecba3,6.0
+Semester 2,45f514dd-f612-4f4f-9d8a-b4b209523ab1,NIU,Noida International University,Numerical Ability,Numerical Ability,3525d39d-b705-45a1-ac24-67291bf35bd6,3.0
+Semester 2,45f514dd-f612-4f4f-9d8a-b4b209523ab1,NIU,Noida International University,Communicative English Advanced,Communicative English Advanced,b21fe64c-21dc-4d6b-bd20-eceb953dd154,2.0
+Semester 2,45f514dd-f612-4f4f-9d8a-b4b209523ab1,NIU,Noida International University,Building LLM Applications,Building LLM Applications,a8f81e0c-22c3-41e6-b98a-ce7552d8e2c7,2.0
+Semester 2,45f514dd-f612-4f4f-9d8a-b4b209523ab1,NIU,Noida International University,Physics,Complaince,4e7a00c7-c332-4269-9641-05faea2995d0,2.0
+Semester 2,09105c4a-966d-4f8f-bda5-337d233029ef,CRESCENT,Crescent University,Front-End Development,Web Application Development 2,7e0446da-981d-4faa-b02d-f4dc605dba66,4.0
+Semester 2,09105c4a-966d-4f8f-bda5-337d233029ef,CRESCENT,Crescent University,Database Management Systems,Database Management Systems,25c1a72c-216e-47e1-9bc6-b2f16c66e0ca,4.0
+Semester 2,09105c4a-966d-4f8f-bda5-337d233029ef,CRESCENT,Crescent University,Problem-Solving Techniques with C++,Data Structures,e216af3e-bcd0-4dee-9c4f-67e7502ecba3,4.0
+Semester 2,09105c4a-966d-4f8f-bda5-337d233029ef,CRESCENT,Crescent University,Advanced Communicative English,Communicative English Advanced,b21fe64c-21dc-4d6b-bd20-eceb953dd154,2.0
+Semester 2,09105c4a-966d-4f8f-bda5-337d233029ef,CRESCENT,Crescent University,Foundations of Generative AI,Introduction to Generative AI,a8f81e0c-22c3-41e6-b98a-ce7552d8e2c7,3.0
+Semester 2,09105c4a-966d-4f8f-bda5-337d233029ef,CRESCENT,Crescent University,Numerical Ability,Numerical Ability,0bbea1fb-25bc-402d-b0d4-72112198d5da,0.0
+Semester 2,09105c4a-966d-4f8f-bda5-337d233029ef,CRESCENT,Crescent University,Universal Human Values,Complaince,,0.0
+Semester 2,09105c4a-966d-4f8f-bda5-337d233029ef,CRESCENT,Crescent University,Quantum Physics,Complaince,,4.0
+Semester 2,1ec07200-92a5-4a11-a542-4eb95b951a04,Takshashila,Takshasila University,Web Application Development II,Web Application Development 2,7e0446da-981d-4faa-b02d-f4dc605dba66,4.0
+Semester 2,1ec07200-92a5-4a11-a542-4eb95b951a04,Takshashila,Takshasila University,Introduction to DBMS,Database Management Systems,25c1a72c-216e-47e1-9bc6-b2f16c66e0ca,4.0
+Semester 2,1ec07200-92a5-4a11-a542-4eb95b951a04,Takshashila,Takshasila University,Data Structures & Algorithms,Data Structures,e216af3e-bcd0-4dee-9c4f-67e7502ecba3,4.0
+Semester 2,1ec07200-92a5-4a11-a542-4eb95b951a04,Takshashila,Takshasila University,Numerical Ability,Numerical Ability,3525d39d-b705-45a1-ac24-67291bf35bd6,3.0
+Semester 2,1ec07200-92a5-4a11-a542-4eb95b951a04,Takshashila,Takshasila University,Communicative English Advanced,Communicative English Advanced,b21fe64c-21dc-4d6b-bd20-eceb953dd154,3.0
+Semester 2,1ec07200-92a5-4a11-a542-4eb95b951a04,Takshashila,Takshasila University,Building LLM Applications,Building LLM Applications,a8f81e0c-22c3-41e6-b98a-ce7552d8e2c7,4.0
+Semester 2,1ec07200-92a5-4a11-a542-4eb95b951a04,Takshashila,Takshasila University,Introduction to IKS,Complaince,,1.0
+Semester 2,55d2a06b-c0cf-4920-b4ce-40850cab237f,AMET,AMET,Web Application Development 2,Web Application Development 2,7e0446da-981d-4faa-b02d-f4dc605dba66,4.0
+Semester 2,55d2a06b-c0cf-4920-b4ce-40850cab237f,AMET,AMET,Database Management Systems,Database Management Systems,25c1a72c-216e-47e1-9bc6-b2f16c66e0ca,4.0
+Semester 2,55d2a06b-c0cf-4920-b4ce-40850cab237f,AMET,AMET,Data Structures,Data Structures,e216af3e-bcd0-4dee-9c4f-67e7502ecba3,6.0
+Semester 2,55d2a06b-c0cf-4920-b4ce-40850cab237f,AMET,AMET,Numerical Ability,Numerical Ability,3525d39d-b705-45a1-ac24-67291bf35bd6,2.0
+Semester 2,55d2a06b-c0cf-4920-b4ce-40850cab237f,AMET,AMET,Communicative English Advanced,Communicative English Advanced,b21fe64c-21dc-4d6b-bd20-eceb953dd154,2.0
+Semester 2,55d2a06b-c0cf-4920-b4ce-40850cab237f,AMET,AMET,Building LLM Applications,Building LLM Applications,a8f81e0c-22c3-41e6-b98a-ce7552d8e2c7,3.0
+Semester 2,55d2a06b-c0cf-4920-b4ce-40850cab237f,AMET,AMET,Engineering Physics,Complaince,,1.0
+Semester 2,55d2a06b-c0cf-4920-b4ce-40850cab237f,AMET,AMET,Engineering Chemistry,Complaince,,1.0
+Semester 2,55d2a06b-c0cf-4920-b4ce-40850cab237f,AMET,AMET,Environmental Sciences,Complaince,,0.0
+Semester 2,55d2a06b-c0cf-4920-b4ce-40850cab237f,AMET,AMET,Base 44 Workshop ( VAC I ),Workshop,,0.0
+Semester 2,4497920d-7f75-4a6c-a913-c8c1c234d5d3,AURORA,Aurora University,Frontend Development Advanced,Web Application Development 2,40ab5ebd-3def-4faf-adca-3d39d921df1c,4.0
+Semester 2,4497920d-7f75-4a6c-a913-c8c1c234d5d3,AURORA,Aurora University,Introduction to Database Management Systems,Database Management Systems,25c1a72c-216e-47e1-9bc6-b2f16c66e0ca,4.0
+Semester 2,4497920d-7f75-4a6c-a913-c8c1c234d5d3,AURORA,Aurora University,Engineering Practice,Complaince,,4.0
+Semester 2,4497920d-7f75-4a6c-a913-c8c1c234d5d3,AURORA,Aurora University,Environmental Science,Complaince,,1.0
+Semester 2,4497920d-7f75-4a6c-a913-c8c1c234d5d3,AURORA,Aurora University,Indian Knowledge System,Complaince,,1.0
+Semester 2,4497920d-7f75-4a6c-a913-c8c1c234d5d3,AURORA,Aurora University,Indian Heritage and Culture,Complaince,,0.0

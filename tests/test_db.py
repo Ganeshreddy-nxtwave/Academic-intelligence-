@@ -113,6 +113,17 @@ def college_summary_is_clean():
     assert junk[0][0] == 0, "internal DC entries leaked into college_summary"
 
 
+def subject_tags_crosswalk():
+    """The course-name crosswalk exists, is ID-keyed, and maps to canonical tags."""
+    _, r, _ = db.run_sql("SELECT count(*) FROM subject_tags WHERE institute_id <> ''", con)
+    assert r[0][0] > 100, f"subject_tags thin or missing institute_id: {r[0][0]}"
+    _, mrv, _ = db.run_sql("""SELECT nxtwave_tag FROM subject_tags
+        WHERE institute_name='Malla Reddy Vishwavidyapeeth'
+          AND university_course='Quantitative Skills' LIMIT 1""", con)
+    assert mrv and mrv[0][0] == "Quantitative Aptitude", \
+        f"MRV 'Quantitative Skills' should tag to 'Quantitative Aptitude', got {mrv}"
+
+
 def issues_join_to_institutes():
     """Recorded issues must join to delivery on institute_name (not the short code)."""
     _, r, _ = db.run_sql("""SELECT count(DISTINCT i.institute_name)
@@ -153,6 +164,7 @@ check("deviation planned_start within 2025-26", planned_start_sane)
 check("deviation covers only designed universities", deviation_scoped_to_designed_unis)
 check("scheduling_rules + planning_standards present", planning_knowledge_present)
 check("course_content ingested + JSON parsed", course_content_parsed)
+check("subject_tags crosswalk (id-keyed, mapped)", subject_tags_crosswalk)
 check("college_summary is clean (real colleges only)", college_summary_is_clean)
 check("recorded issues join to institutes", issues_join_to_institutes)
 check("session_feedback_safe excludes comment text", feedback_safe_hides_comments)
