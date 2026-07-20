@@ -75,8 +75,8 @@ def render():
     st.divider()
     st.subheader(f"{uni} · {sem}")
 
-    tabs = st.tabs(["Subjects → Content", "Courses → Sessions", "Academic Planning",
-                    "Alignment", "Feedback", "Issues"])
+    tabs = st.tabs(["Subjects → Content", "Courses → Sessions", "Instructor Delivery",
+                    "Academic Planning", "Alignment", "Feedback", "Issues"])
 
     # 1) SUBJECTS -> CONTENT : crosswalk (their name <-> tag) + content counts
     with tabs[0]:
@@ -135,8 +135,35 @@ def render():
                 "Teaching rating": r[7] or "—", "Has content unit": "✓" if r[8] else "—"}
                 for r in rows], width="stretch", hide_index=True)
 
-    # 3) ACADEMIC PLANNING : derived (all unis) + designed (the 4)
+    # 3) INSTRUCTOR DELIVERY : per-instructor stats, derived from the chain (session_link)
     with tabs[2]:
+        instr = con.execute("""SELECT instructor_name, any_value(instructor_category) AS cat,
+                count(*) FILTER (WHERE is_scheduled)                          AS sessions,
+                count(DISTINCT course_title)                                 AS courses,
+                round(100.0 * count(*) FILTER (WHERE session_status='COMPLETED')
+                      / nullif(count(*) FILTER (WHERE is_scheduled), 0), 0)  AS pct_completed
+            FROM session_link
+            WHERE institute_name=? AND semester=? AND instructor_name IS NOT NULL
+            GROUP BY 1 ORDER BY sessions DESC""", [uni, sem]).fetchall()
+        if instr:
+            tot = sum(r[2] for r in instr)
+            done = sum((r[4] or 0) * r[2] for r in instr)
+            k = st.columns(3)
+            k[0].metric("Instructors", len(instr))
+            k[1].metric("Sessions", f"{tot:,}")
+            k[2].metric("Avg completion", f"{round(done / tot) if tot else 0}%")
+            st.dataframe([{
+                "Instructor": r[0], "Category": r[1] or "—", "Sessions": r[2],
+                "Courses": r[3], "Completion %": r[4]} for r in instr],
+                width="stretch", hide_index=True)
+            st.caption("Derived from the chain (session_link) for this university & semester. "
+                       "Low completion may reflect scheduling, not the instructor.")
+        else:
+            st.info("No instructor data for this selection "
+                    "(the instructor table covers NIAT-tracked delivery).")
+
+    # 4) ACADEMIC PLANNING : derived (all unis) + designed (the 4)
+    with tabs[3]:
         st.markdown("**Derived from delivery** (available for every university)")
         dp = con.execute("""SELECT course_title, sessions_per_section, teaching_weeks,
                 first_session, last_session, start_slip_days, pct_completed
@@ -161,8 +188,8 @@ def render():
                 "Planned hrs": r[3], "Planned weeks": r[4]} for r in designed],
                 width="stretch", hide_index=True)
 
-    # 4) ALIGNMENT : how well each link in the chain holds
-    with tabs[3]:
+    # 5) ALIGNMENT : how well each link in the chain holds
+    with tabs[4]:
         st.markdown("**How well the chain links up for this university & semester**")
         # course -> tag coverage
         cov = con.execute("""
@@ -204,8 +231,8 @@ def render():
                    f"same day (fallback): {pm.get('day', 0):,} · unmatched: {pm.get('none', 0):,}. "
                    "delivered_niat and delivered_sessions share no key; this is the known break.")
 
-    # 5) FEEDBACK
-    with tabs[4]:
+    # 6) FEEDBACK
+    with tabs[5]:
         agg = con.execute("""SELECT count(*), round(avg(TRY_CAST(session_understanding_rating AS DOUBLE)),2),
                 round(avg(TRY_CAST(teaching_quality_rating AS DOUBLE)),2)
             FROM session_feedback_safe WHERE institute_name=?""", [uni]).fetchone()
@@ -224,8 +251,8 @@ def render():
         else:
             st.info("No feedback recorded for this university.")
 
-    # 6) ISSUES
-    with tabs[5]:
+    # 7) ISSUES
+    with tabs[6]:
         issues = con.execute("""SELECT primary_layer, category, issue_title, solutioning_direction, status
             FROM issues WHERE institute_name=? ORDER BY primary_layer""", [uni]).fetchall()
         if issues:
