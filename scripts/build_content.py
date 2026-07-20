@@ -1,30 +1,37 @@
 #!/usr/bin/env python3
-"""Flatten course content exports into one committed, queryable table.
+"""Flatten course content exports (xlsx + json) into one committed, queryable table.
 
-Reads every *.xlsx in data/raw/content/ (each a course's content export with the
-sheets: Course Outline, Objective/Classroom-Quiz/Coding-Practice JSON) and writes
-data/canonical/course_content.csv — one row per content unit, with the embedded
-JSON (options, answers) parsed to plain text.
+Handles the several export shapes seen in the wild:
+  - Full xlsx: Course Outline + Objective/Classroom-Quiz/Coding-Practice JSON sheets
+    (options embedded as JSON in cells).
+  - Reading-only xlsx: readings inline in a sheet (named "Course Outline" or "Sheet1")
+    with a "Reading Material Content" column; questions live elsewhere.
+  - Standalone .json: a list of content units (questions + learning resources) with
+    answer / difficulty / explanation — the payload the xlsx's "JSONs" sheet links to.
 
-Drop a new course's content xlsx into data/raw/content/ and re-run — this is the
-content-coverage pipeline (content previously reached only ~15 of 63 courses).
+Writes data/canonical/course_content.csv, one row per content unit, JSON parsed to
+plain text. Drop any of the above into data/raw/content/ and re-run.
 
 Usage: python scripts/build_content.py
 """
-import csv, glob, json, os, re, sys, zipfile
+import ast, csv, glob, json, os, re, sys, zipfile
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from xlsx_dump import shared_strings, sheet_map, read_sheet
 
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 RAW = "data/raw/content"
 OUT = "data/canonical/course_content.csv"
+COLS = ["course", "module", "topic", "session_id", "session_name", "unit_id", "unit_name",
+        "kind", "question_type", "difficulty", "content", "options", "correct_answer",
+        "explanation", "code"]
 
 
 def strip_html(s):
     return re.sub(r"<[^>]+>", " ", s or "").replace("&nbsp;", " ").strip()
 
 
-def parse_options(raw):
+def parse_json_list(raw):
+    """Available_options / JSON-array answer -> ' | '-joined content strings."""
     try:
         arr = json.loads(raw) if raw and raw.strip().startswith("[") else []
         return " | ".join(o.get("content", "").strip() for o in arr if isinstance(o, dict))
@@ -35,100 +42,134 @@ def parse_options(raw):
 def parse_answer(raw):
     if not raw:
         return ""
-    if raw.strip().startswith("["):
-        try:
-            return " | ".join(o.get("content", "").strip() for o in json.loads(raw) if isinstance(o, dict))
-        except (json.JSONDecodeError, TypeError):
-            return raw.strip()
-    return raw.strip()
+    return parse_json_list(raw) if raw.strip().startswith("[") else raw.strip()
 
 
+def parse_explanation(raw):
+    """answer_explanation is a stringified python dict {'content':..,'content_type':..}."""
+    if not raw or not str(raw).strip():
+        return ""
+    try:
+        d = ast.literal_eval(raw) if isinstance(raw, str) else raw
+        return strip_html(d.get("content", "")) if isinstance(d, dict) else strip_html(str(raw))
+    except (ValueError, SyntaxError):
+        return strip_html(str(raw))
+
+
+def rec(**kw):
+    base = {c: "" for c in COLS}
+    base.update(kw)
+    return base
+
+
+# ---------- xlsx ----------
 def sheets(path):
     z = zipfile.ZipFile(path)
     sst = shared_strings(z)
     out = {}
     for name, p in sheet_map(z):
         grid = read_sheet(z, p, sst)
-        if grid:
-            hdr = grid[0]
-            out[name] = (hdr, [dict(zip(hdr, r)) for r in grid[1:] if any(c.strip() for c in r)])
+        if grid and grid[0]:
+            hdr = [h.strip() for h in grid[0]]
+            out[name] = [dict(zip(hdr, r)) for r in grid[1:] if any(c.strip() for c in r)]
     return out
 
 
-def extract(path):
+def ci(row, *names):
+    """case-insensitive column fetch, tolerant of trailing spaces."""
+    low = {k.lower().strip(): v for k, v in row.items()}
+    for n in names:
+        v = low.get(n.lower().strip())
+        if v is not None and str(v).strip():
+            return str(v).strip()
+    return ""
+
+
+def extract_xlsx(path):
     sh = sheets(path)
-    recs = []
+    course = ""
+    for rows in sh.values():
+        for r in rows:
+            course = ci(r, "Course Name", "Course name", "Course Title")
+            if course:
+                break
+        if course:
+            break
+    if not course:
+        course = re.sub(r"\s*(Course\s*)?Contents?$", "", os.path.splitext(os.path.basename(path))[0], flags=re.I).strip()
+    grp = lambda r: ci(r, "Module Name", "Topic Name")
+    out = []
 
-    def course_of(rowset):
-        for r in rowset:
-            if (r.get("Course Name") or "").strip():
-                return r["Course Name"].strip()
-        # fallback: filename minus the "... [Course] Contents" boilerplate
-        stem = os.path.splitext(os.path.basename(path))[0]
-        return re.sub(r"\s*(Course\s*)?Contents?$", "", stem, flags=re.I).strip()
+    # readings — from ANY sheet that has a reading-content column
+    for rows in sh.values():
+        for r in rows:
+            content = ci(r, "Reading Material Content", "Reading material content")
+            if content:
+                out.append(rec(course=course, module=grp(r), topic=ci(r, "Topic Name"),
+                               session_id=ci(r, "Session ID"), session_name=ci(r, "Session Name"),
+                               unit_id=ci(r, "Unit ID", "Reading Material id", "Reading Material Name"),
+                               kind="reading", content=content))
 
-    outline = sh.get("Course Outline", (None, []))[1]
-    course = course_of(outline)
-    # exports label the grouping "Module Name" or "Topic Name" depending on the course
-    grp = lambda r: (r.get("Module Name") or r.get("Topic Name") or "").strip()
-
-    # reading materials (markdown/text in the outline)
-    for r in outline:
-        content = (r.get("Reading Material Content") or "").strip()
-        if content:
-            recs.append(dict(course=course, module=grp(r), topic=r.get("Topic Name", ""),
-                             session_id=r.get("Session ID", ""), session_name=r.get("Session Name", ""),
-                             unit_id=r.get("Reading Material id", ""), unit_name="", kind="reading",
-                             question_type="", content=content, options="", correct_answer="", code=""))
-
-    # objective + classroom-quiz questions (parse the JSON option arrays)
-    for sheet, kind in [("Objective Content JSON", "objective"),
-                        ("Classroom Quiz JSON", "classroom_quiz")]:
-        for r in sh.get(sheet, (None, []))[1]:
-            if not (r.get("Content") or "").strip():
+    # questions — from the embedded JSON sheets when present
+    for sheet, kind in [("Objective Content JSON", "objective"), ("Classroom Quiz JSON", "classroom_quiz")]:
+        for r in sh.get(sheet, []):
+            if not ci(r, "Content"):
                 continue
-            recs.append(dict(course=course, module=grp(r), topic=r.get("Topic Name", ""),
-                             session_id=r.get("Session ID", ""), session_name=r.get("Session Name", ""),
-                             unit_id=r.get("Unit ID", ""), unit_name=r.get("Unit Name", ""), kind=kind,
-                             question_type=r.get("Question_type", ""), content=strip_html(r.get("Content", "")),
-                             options=parse_options(r.get("Available_options", "")),
-                             correct_answer=parse_answer(r.get("Correct_answer", "")),
-                             code=(r.get("Code", "") or "").strip()))
-
-    # coding practice
-    for r in sh.get("Coding Practice JSON", (None, []))[1]:
-        if not (r.get("Content") or "").strip():
+            out.append(rec(course=course, module=grp(r), topic=ci(r, "Topic Name"),
+                           session_id=ci(r, "Session ID"), session_name=ci(r, "Session Name"),
+                           unit_id=ci(r, "Unit ID"), unit_name=ci(r, "Unit Name"), kind=kind,
+                           question_type=ci(r, "Question_type"), content=strip_html(ci(r, "Content")),
+                           options=parse_json_list(ci(r, "Available_options")),
+                           correct_answer=parse_answer(ci(r, "Correct_answer")), code=ci(r, "Code")))
+    for r in sh.get("Coding Practice JSON", []):
+        if not ci(r, "Content"):
             continue
-        recs.append(dict(course=course, module=grp(r), topic=r.get("Topic Name", ""),
-                         session_id=r.get("Session ID", ""), session_name=r.get("Session Name", ""),
-                         unit_id=r.get("Unit ID", ""), unit_name=r.get("Unit Name", ""), kind="coding",
-                         question_type="", content=strip_html(r.get("Content", "")), options="",
-                         correct_answer="", code=r.get("code_id", "")))
-    return course, recs
+        out.append(rec(course=course, module=grp(r), topic=ci(r, "Topic Name"),
+                       session_id=ci(r, "Session ID"), session_name=ci(r, "Session Name"),
+                       unit_id=ci(r, "Unit ID"), unit_name=ci(r, "Unit Name"), kind="coding",
+                       content=strip_html(ci(r, "Content")), code=ci(r, "code_id")))
+    return course, out
+
+
+# ---------- json ----------
+def extract_json(path):
+    data = json.load(open(path, encoding="utf-8"))
+    if not isinstance(data, list):
+        return "", []
+    course = next((x.get("course_title") for x in data if x.get("course_title")), os.path.splitext(os.path.basename(path))[0])
+    out = []
+    for x in data:
+        obj = (x.get("object_type") or "").upper()
+        kind = "reading" if obj == "LEARNING_RESOURCE" else "objective"
+        content = strip_html(x.get("content") or "") or (x.get("short_text") or "").strip()
+        if not content:
+            continue
+        out.append(rec(course=x.get("course_title") or course, topic=x.get("topic_name") or "",
+                       unit_id=x.get("unit_id") or "", unit_name=x.get("unit_name") or "", kind=kind,
+                       question_type=x.get("question_type") or "", difficulty=(x.get("difficulty") or "").strip(),
+                       content=content, correct_answer=strip_html(str(x.get("answer") or "")),
+                       explanation=parse_explanation(x.get("answer_explanation"))))
+    return course, out
 
 
 def main():
-    files = sorted(glob.glob(os.path.join(RAW, "*.xlsx")))
-    assert files, f"no content exports in {RAW}/ — drop a course content xlsx there"
-    cols = ["course", "module", "topic", "session_id", "session_name", "unit_id",
-            "unit_name", "kind", "question_type", "content", "options", "correct_answer", "code"]
+    files = sorted(glob.glob(os.path.join(RAW, "*.xlsx")) + glob.glob(os.path.join(RAW, "*.json")))
+    assert files, f"no content exports in {RAW}/"
     all_recs = []
+    from collections import Counter
     for f in files:
-        course, recs = extract(f)
+        course, recs = extract_json(f) if f.endswith(".json") else extract_xlsx(f)
         all_recs += recs
-        from collections import Counter
-        kinds = Counter(r["kind"] for r in recs)
-        print(f"  {os.path.basename(f)}: {course} -> {len(recs)} units  {dict(kinds)}")
+        print(f"  {os.path.basename(f)}: {course} -> {len(recs)} units  {dict(Counter(r['kind'] for r in recs))}")
 
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
     with open(OUT, "w", newline="", encoding="utf-8") as fh:
-        w = csv.DictWriter(fh, fieldnames=cols, extrasaction="ignore")
+        w = csv.DictWriter(fh, fieldnames=COLS, extrasaction="ignore")
         w.writeheader()
         w.writerows(all_recs)
-    print(f"  course_content.csv: {len(all_recs)} rows, {len({r['course'] for r in all_recs})} course(s)")
+    print(f"  course_content.csv: {len(all_recs)} rows, {len({r['course'] for r in all_recs})} courses")
     assert all_recs, "no content extracted"
-    # options must actually be parsed (not left as raw JSON) for MCQ-type questions
-    mcq = [r for r in all_recs if r["kind"] in ("objective", "classroom_quiz") and r["options"]]
+    mcq = [r for r in all_recs if r["options"]]
     assert not any(r["options"].strip().startswith("[{") for r in mcq), "options JSON not parsed"
 
 
