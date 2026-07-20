@@ -231,6 +231,24 @@ def render():
                    f"same day (fallback): {pm.get('day', 0):,} · unmatched: {pm.get('none', 0):,}. "
                    "delivered_niat and delivered_sessions share no key; this is the known break.")
 
+        # why-unmatched diagnostic: is the gap a time mismatch, or a scope/naming gap?
+        if pm.get("none"):
+            diag = con.execute("""
+                WITH un AS (SELECT lower(trim(session_title)) t FROM session_link
+                            WHERE institute_name=? AND semester=? AND is_scheduled AND NOT linked),
+                     titles AS (SELECT DISTINCT lower(trim(session_title)) t
+                                FROM delivered_sessions WHERE institute_name=?)
+                SELECT count(*), count(*) FILTER (WHERE t IN (SELECT t FROM titles)) FROM un
+                """, [uni, sem, uni]).fetchone()
+            tot_un, time_mismatch = diag[0], diag[1]
+            not_found = tot_un - time_mismatch
+            with st.expander(f"Why {tot_un:,} sessions didn't link"):
+                st.write(f"- **{time_mismatch:,} ({round(100*time_mismatch/tot_un)}%)** — title exists in the "
+                         "scheduling data but at a different time (a time/section mismatch).")
+                st.write(f"- **{not_found:,} ({round(100*not_found/tot_un)}%)** — title not in the scheduling data "
+                         "at all: the two delivery exports cover different scopes (delivered_niat is broader "
+                         "than the unit-linked Clickup sessions), or the title differs. Not a bug — a data-scope gap.")
+
     # 6) FEEDBACK
     with tabs[5]:
         agg = con.execute("""SELECT count(*), round(avg(TRY_CAST(session_understanding_rating AS DOUBLE)),2),
