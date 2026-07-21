@@ -79,7 +79,7 @@ def render():
     st.subheader(f"{uni} · {sem}")
 
     tabs = st.tabs(["Subjects → Content", "Courses → Sessions", "Instructor Delivery",
-                    "Academic Planning", "Alignment", "Feedback", "Issues"])
+                    "Academic Planning", "Alignment", "Feedback"])
 
     # 1) SUBJECTS -> CONTENT : crosswalk (their name <-> tag) + content counts
     with tabs[0]:
@@ -290,18 +290,3 @@ def render():
             st.caption(f"Student feedback for {sem} (placed via the session's scheduling link).")
         else:
             st.info(f"No feedback recorded for {uni} in {sem}.")
-
-    # 7) ISSUES
-    with tabs[6]:
-        issues = con.execute("""SELECT primary_layer, category, issue_title, solutioning_direction, status
-            FROM issues WHERE institute_name=? ORDER BY primary_layer""", [uni]).fetchall()
-        if issues:
-            st.caption(f"{len(issues)} recorded issue(s)")
-            st.dataframe([{"Layer": r[0], "Category": r[1], "Issue": r[2],
-                           "Solutioning direction": r[3], "Status": r[4]} for r in issues],
-                         width="stretch", hide_index=True)
-        else:
-            covered = [r[0] for r in con.execute(
-                "SELECT DISTINCT institute_name FROM issues WHERE institute_name IS NOT NULL ORDER BY 1").fetchall()]
-            where = ", ".join(covered) if covered else "no universities yet"
-            st.info(f"No issues logged for {uni}. The RCA/issues board currently covers: {where}.")
