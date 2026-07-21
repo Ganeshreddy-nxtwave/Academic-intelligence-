@@ -12,6 +12,12 @@ is a thing that will produce a confidently wrong answer if ignored.
 - **`delivered_niat` cannot be joined to `delivered_sessions`.** It carries no `unit_id` and no `session_id`. Use it standalone for instructor / course-title / session-status questions. Do not invent a join on title+timestamp.
 - **A session's `session_type` is only LECTURE / PRACTICE / EXAM.** "Quiz" is NOT a session type — it is a **content unit** (`delivered_sessions.resource_type='LP_QUIZ'`, or `course_content.kind='classroom_quiz'`), one level below the session (a session holds ~2 units). So "how many quiz *sessions*" is a category error; answer quiz questions from units/content, and lecture/practice/exam counts from `session_type`.
 
+## Current data scope & linkage health (know this before answering coverage questions)
+- **Universities:** 17 real (in `college_summary`), all subject-mapped. Delivery spans **Semesters 1–4**; the subjects sheet (`subject_tags`) is **1st-year only (Sem 1+2)**, so Sem-3/4 courses are largely untagged.
+- **Subjects:** 20 canonical `nxtwave_tag`s. **Designed HLID plans:** 16 universities in `course_plan_vs_actual` (**code `NIATCH` = NIAT Chevella**). Derived planning (`academic_plan_derived`) covers all 17.
+- **Content:** ingested (`course_content`) for ~13 course names; catalogue (`reading/objective/coding/editorials`) for ~15. **Editorials** = DSA coding-question solutions, in `content_all` as `kind='editorial'`. **Feedback:** 6,945 rated sessions (empties removed; every row has a `session_id`).
+- **Known linkage gaps — caveat these in answers:** Session→Scheduling links **~85%** (fuzzy bridge; 15% unmatched). Only **~70%** of delivered curriculum courses map to a subject (mostly Sem-3/4). Content exists for a minority of delivered units. 8 subjects have no content yet. Absence usually means *not covered/ingested*, not *zero*.
+
 ## Table meanings and grain
 
 | Table | Grain | Notes |
