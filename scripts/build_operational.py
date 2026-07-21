@@ -44,6 +44,7 @@ con.execute(f"""COPY (
     ON  q.institute_name = l.institute_name
     AND q.session_id     = l.session_id
     AND coalesce(q.unit_ids,'') = coalesce(l.unit_ids,'')
+  WHERE coalesce(q.institute_name, l.institute_name) IS NOT NULL   -- drop empty export rows
 ) TO '{OUT_FEEDBACK}/session_feedback.csv' (HEADER, DELIMITER ',')""")
 
 # 3) instructor_sessions: per-instructor delivery aggregates (from NIAT)

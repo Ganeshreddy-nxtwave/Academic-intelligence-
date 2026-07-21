@@ -33,6 +33,9 @@ ALIAS = {
     "NRI": "NRI", "NIU": "Noida International University", "AMET": "AMET",
 }
 
+# Canonicalise sheet typos in the TAGS column so one subject isn't split across spellings.
+TAG_FIX = {"Complaince": "Compliance"}
+
 
 def grids(path):
     z = zipfile.ZipFile(path)
@@ -59,6 +62,7 @@ def main():
             uni = g(r, "UNVERSITY NAME") or g(r, "UNIVERSITY NAME")
             course = g(r, "COURSE NAMES")
             tag = g(r, "TAGS")
+            tag = TAG_FIX.get(tag, tag)
             if not (uni and course and tag):
                 continue
             institute = ALIAS.get(uni)
