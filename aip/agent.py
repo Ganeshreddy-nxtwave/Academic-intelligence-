@@ -26,6 +26,7 @@ DEFAULT_MODEL = "anthropic/claude-opus-4.8"
 MAX_TOOL_ITERS = 22
 NOTES_PATH = pathlib.Path(__file__).resolve().parents[1] / "docs" / "data-notes.md"
 EXAMPLES_PATH = pathlib.Path(__file__).resolve().parents[1] / "docs" / "examples.md"
+PRODUCT_PATH = pathlib.Path(__file__).resolve().parents[1] / "docs" / "product-context.md"
 
 TOOLS = [{
     "type": "function",
@@ -64,6 +65,10 @@ You have one tool: `run_sql`, a read-only DuckDB query. Every factual claim you 
 
 ## Data notes (authoritative — these override any assumption)
 {_read(NOTES_PATH)}
+
+## Product context (what NIAT is, how it's delivered — background, NOT a data source)
+Use this to interpret the data (e.g. why a university has Co-Delivery vs Full vs Hybrid, what a batch/branch means, what the IRC outcome is). It is reference context — every *number* must still come from a `run_sql` query, not from here.
+{_read(PRODUCT_PATH)}
 
 ## Worked examples — match this standard
 {_read(EXAMPLES_PATH)}
