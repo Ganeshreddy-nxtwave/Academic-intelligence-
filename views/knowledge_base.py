@@ -205,30 +205,50 @@ def render():
                 FROM delivered_niat d
                 WHERE d.institute_name=? AND d.semester='Semester 1' AND is_curriculum(d.course_title)
             )
-            SELECT DISTINCT plan.course, plan.planned_sessions, plan.planned_total_hours, plan.planned_weeks, plan.coverage,
+            SELECT plan.course, plan.planned_sessions, plan.planned_total_hours, plan.planned_weeks,
+                   plan.coverage, plan.actual_lectures_per_section,
                    (SELECT c.course_title FROM cand c WHERE c.tag=plan.tag AND plan.tag IS NOT NULL LIMIT 1) AS as_tag,
                    (SELECT c.course_title FROM cand c ORDER BY jaro_winkler_similarity(c.dk, plan.pk) DESC LIMIT 1) AS as_fuzzy,
                    (SELECT max(jaro_winkler_similarity(c.dk, plan.pk)) FROM cand c) AS sim
             FROM plan ORDER BY plan.planned_sessions DESC NULLS LAST
         """, [uni, uni, uni]).fetchall()
         if designed and sem == "Semester 1":
-            def _delivery(cov, as_tag, as_fuzzy, sim):
-                if cov == "both":
-                    return "✓ delivered"
-                if as_tag:
-                    return f"delivered as ‘{as_tag}’"
-                if sim is not None and sim >= 0.90:
-                    return f"delivered as ‘{as_fuzzy}’ (name differs)"
-                return "not delivered"
+            # actual lecture-sessions/section per delivered course, so we can show the gap
+            # even for courses delivered under a different name.
+            actual_map = dict(con.execute("""SELECT course, sum(actual_lectures_per_section)
+                FROM course_plan_vs_actual
+                WHERE university IN (SELECT code FROM universities WHERE institute_name=?)
+                  AND actual_lectures_per_section IS NOT NULL GROUP BY course""", [uni]).fetchall())
+            from collections import OrderedDict
+            agg = OrderedDict()  # one row per planned course; sum actual across multi-matches (lecture + lab)
+            for course, planned, hrs, weeks, cov, actual_self, as_tag, as_fuzzy, sim in designed:
+                d = agg.setdefault(course, {"planned": planned, "hrs": hrs, "weeks": weeks, "cov": cov,
+                                            "actual": 0.0, "as_tag": as_tag, "as_fuzzy": as_fuzzy, "sim": sim})
+                if actual_self is not None:
+                    d["actual"] += actual_self
+            table = []
+            for course, d in agg.items():
+                if d["cov"] == "both":
+                    delivery, actual = "✓ delivered", d["actual"]
+                elif d["as_tag"]:
+                    delivery, actual = f"delivered as '{d['as_tag']}'", actual_map.get(d["as_tag"])
+                elif d["sim"] is not None and d["sim"] >= 0.90:
+                    delivery, actual = f"delivered as '{d['as_fuzzy']}' (name differs)", actual_map.get(d["as_fuzzy"])
+                else:
+                    delivery, actual = "not delivered", None
+                planned = d["planned"]
+                gap = (round(actual) - round(planned)) if (actual and planned is not None) else None
+                table.append({
+                    "Course": course, "Planned sessions": round(planned) if planned is not None else "—",
+                    "Planned hrs": d["hrs"], "Planned weeks": d["weeks"], "Delivery": delivery,
+                    "Actual/section": round(actual, 1) if actual else "—",
+                    "Gap": (f"{gap:+d}" if gap is not None else "—")})
             st.markdown("**Designed plan** (HLID — Semester 1). Each row is a planned course; "
-                        "**Delivery** explains whether and how it actually ran.")
-            st.dataframe([{
-                "Course": r[0], "Planned sessions": r[1], "Planned hrs": r[2], "Planned weeks": r[3],
-                "Delivery": _delivery(r[4], r[5], r[6], r[7])} for r in designed],
-                width="stretch", hide_index=True)
-            st.caption("**Delivery** — ✓ delivered: ran under the same name · "
-                       "*delivered as '…'*: the same subject ran under a different name (matched by "
-                       "subject, or a near-identical name) · *not delivered*: no delivery counterpart found.")
+                        "**Delivery** explains how it ran and **Gap** is actual − planned sessions/section.")
+            st.dataframe(table, width="stretch", hide_index=True)
+            st.caption("**Delivery** — ✓ delivered (same name) · *delivered as '…'* (same subject, different "
+                       "name) · *not delivered*. **Actual/section** = lecture sessions delivered per section; "
+                       "**Gap** = actual − planned (+ over-delivered, − under).")
 
     # 5) ALIGNMENT : how well each link in the chain holds
     with tabs[4]:
