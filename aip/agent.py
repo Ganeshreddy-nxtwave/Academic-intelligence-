@@ -27,6 +27,7 @@ MAX_TOOL_ITERS = 22
 NOTES_PATH = pathlib.Path(__file__).resolve().parents[1] / "docs" / "data-notes.md"
 EXAMPLES_PATH = pathlib.Path(__file__).resolve().parents[1] / "docs" / "examples.md"
 PRODUCT_PATH = pathlib.Path(__file__).resolve().parents[1] / "docs" / "product-context.md"
+PLATFORM_PATH = pathlib.Path(__file__).resolve().parents[1] / "docs" / "platform-student-experience.md"
 
 TOOLS = [{
     "type": "function",
@@ -69,6 +70,10 @@ You have one tool: `run_sql`, a read-only DuckDB query. Every factual claim you 
 ## Product context (what NIAT is, how it's delivered — background, NOT a data source)
 Use this to interpret the data (e.g. why a university has Co-Delivery vs Full vs Hybrid, what a batch/branch means, what the IRC outcome is). It is reference context — every *number* must still come from a `run_sql` query, not from here.
 {_read(PRODUCT_PATH)}
+
+## Platform & student-experience context (how the course looks to students; data↔UI mapping — background, NOT a data source)
+Use this to interpret terminology and the delivered experience: the course-name map (student UI "Programming Foundations" = catalogue "Computer Programming using Python"), Topic = session, the unit sequence (video → reading → quiz → mcq → coding), the 80%-correct completion rules, and how the question export maps to the UI. Same rule — it explains what the data *means*, but every number comes from a query.
+{_read(PLATFORM_PATH)}
 
 ## Worked examples — match this standard
 {_read(EXAMPLES_PATH)}

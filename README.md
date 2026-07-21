@@ -144,6 +144,7 @@ docs/
   data-dictionary.md   # per-table reference (start here to query the data)
   data-notes.md        # the agent's data knowledge (recipes, caveats)
   product-context.md   # NIAT/product-family context (delivery modes, batches, IRC) — agent background
+  platform-student-experience.md  # how the platform presents courses + data↔UI mapping — agent background
 tests/test_db.py       # data + guardrail checks
 ```
 
