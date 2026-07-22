@@ -93,34 +93,51 @@ def guide_resource() -> str:
     return _load("data-notes.md", "examples.md")
 
 
-def _with_auth(app, token, health_path="/healthz"):
-    """Pure-ASGI wrapper: unauthenticated /healthz for Render's probe, and a
-    bearer-token gate on everything else when AIP_MCP_TOKEN is set. Written at the
-    ASGI layer (not BaseHTTPMiddleware) so it never buffers MCP's streaming responses."""
-    async def wrapped(scope, receive, send):
-        if scope["type"] != "http":
-            return await app(scope, receive, send)
-        if scope.get("path") == health_path:
-            await send({"type": "http.response.start", "status": 200,
-                        "headers": [(b"content-type", b"text/plain")]})
-            await send({"type": "http.response.body", "body": b"ok"})
-            return
-        if token:
+class _BearerAuth:
+    """Pure-ASGI bearer gate (no response buffering, unlike BaseHTTPMiddleware).
+    /healthz stays open for the health probe."""
+    def __init__(self, app, token):
+        self.app, self.token = app, token
+
+    async def __call__(self, scope, receive, send):
+        if scope["type"] == "http" and scope.get("path") != "/healthz":
             headers = dict(scope.get("headers") or [])
-            if headers.get(b"authorization", b"").decode() != f"Bearer {token}":
+            if headers.get(b"authorization", b"").decode() != f"Bearer {self.token}":
                 await send({"type": "http.response.start", "status": 401,
                             "headers": [(b"content-type", b"application/json")]})
                 await send({"type": "http.response.body", "body": b'{"error":"unauthorized"}'})
                 return
-        await app(scope, receive, send)
-    return wrapped
+        await self.app(scope, receive, send)
+
+
+def _http_app():
+    """Starlette app for remote serving: MCP at /mcp, an open /healthz for Render's
+    probe, optional bearer auth. DNS-rebinding protection is OFF -- it guards LOCAL
+    servers against browser rebinding; a public Render deployment is reached by
+    non-local hosts by design, so the Host check must not 421 them."""
+    from mcp.server.transport_security import TransportSecuritySettings
+    from starlette.responses import PlainTextResponse
+    from starlette.routing import Route
+
+    mcp.settings.transport_security = TransportSecuritySettings(
+        enable_dns_rebinding_protection=False)
+    app = mcp.streamable_http_app()
+
+    async def healthz(_request):
+        return PlainTextResponse("ok")
+    # Prepend so it wins over the /mcp mount regardless of route ordering.
+    app.router.routes.insert(0, Route("/healthz", healthz, methods=["GET"]))
+
+    token = os.environ.get("AIP_MCP_TOKEN")
+    if token:
+        app.add_middleware(_BearerAuth, token=token)
+    return app
 
 
 if __name__ == "__main__":
     if "--http" in sys.argv:
         # Remote connector: bind 0.0.0.0:$PORT for Render; the MCP endpoint is /mcp.
         import uvicorn
-        app = _with_auth(mcp.streamable_http_app(), os.environ.get("AIP_MCP_TOKEN"))
-        uvicorn.run(app, host="0.0.0.0", port=int(os.environ.get("PORT", "8000")))
+        uvicorn.run(_http_app(), host="0.0.0.0", port=int(os.environ.get("PORT", "8000")))
     else:
         mcp.run(transport="stdio")
