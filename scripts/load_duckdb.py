@@ -80,6 +80,29 @@ def build(db="data/aip.duckdb", verbose=True):
         '[^a-z0-9]', '', 'g'))""")
     con.execute("CREATE MACRO course_key(t) AS (regexp_replace(course_key_loose(t), '1$', ''))")
 
+    # Curated course aliases: a hand-mapped raw_title -> catalogue course table that
+    # patches the highest-volume gaps in course_crosswalk. The source crosswalk leaves
+    # ~54% of titles unmapped because layers name the same course differently and source
+    # typos ("Programmining") spawn phantoms; this flips the real courses to
+    # match_status='alias'. Genuine non-courses (assessments, orientation, non-CS
+    # subjects like Basic Electronics/Physics) are deliberately NOT aliased — they have
+    # no catalogue course, so they correctly stay 'unmapped'. Source: course_alias.csv.
+    if ("course_alias",) in con.execute("SHOW TABLES").fetchall():
+        con.execute("""UPDATE course_crosswalk
+            SET catalogue_course_title = a.catalogue_course_title,
+                stack = a.stack, match_status = 'alias'
+            FROM course_alias a
+            WHERE lower(trim(course_crosswalk.raw_title)) = lower(trim(a.raw_title))
+              AND course_crosswalk.match_status = 'unmapped'""")
+        con.execute("""INSERT INTO course_crosswalk
+            (layer, raw_title, course_key, match_status, catalogue_course_title, stack)
+            SELECT 'delivered', a.raw_title, course_key(a.raw_title), 'alias',
+                   a.catalogue_course_title, a.stack
+            FROM course_alias a
+            WHERE NOT EXISTS (SELECT 1 FROM course_crosswalk c
+                              WHERE lower(trim(c.raw_title)) = lower(trim(a.raw_title)))""")
+        con.execute("DROP TABLE course_alias")
+
     # content_units: unified view over the three content-item tables.
     con.execute("""CREATE VIEW content_units AS
         SELECT unit_id, course_title, 'objective' AS k FROM objective_questions
