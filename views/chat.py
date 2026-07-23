@@ -10,12 +10,19 @@ import streamlit as st
 from aip import agent, dashboard, export
 
 # Cost/capability ladder, cheapest first — the slider order. All support tool-calling.
+# Non-Anthropic tiers route through OpenRouter too; slugs were verified live against the
+# OpenRouter models API (all report `tools` support). Caveat: "supports tools" is not the
+# same as doing 20-step tool use WELL on a planning task — test before trusting for HLIDs.
+# ponytail: update a slug if the family bumps its version (they move fast).
 MODEL_TIERS = [
-    ("Haiku 4.5",  "anthropic/claude-haiku-4.5",  "$1/$5 · fastest, cheapest — counts and lookups"),
-    ("Sonnet 4.5", "anthropic/claude-sonnet-4.5", "$3/$15 · balanced — most questions"),
-    ("Opus 4.6",   "anthropic/claude-opus-4.6",   "$5/$25 · deep analysis"),
-    ("Opus 4.7",   "anthropic/claude-opus-4.7",   "$5/$25 · deep analysis, newer"),
-    ("Opus 4.8",   "anthropic/claude-opus-4.8",   "$5/$25 · deepest — planning, HLIDs, advisory"),
+    ("DeepSeek V4-Pro", "deepseek/deepseek-v4-pro",    "$0.43/$0.87 · cheapest, 1M ctx — value pick"),
+    ("GLM 5.2",         "z-ai/glm-5.2",                "$0.80/$2.53 · cheap, 1M ctx"),
+    ("Haiku 4.5",       "anthropic/claude-haiku-4.5",  "$1/$5 · fast — counts and lookups"),
+    ("Kimi K3",         "moonshotai/kimi-k3",          "$3/$15 · premium (~Opus price, not cheap)"),
+    ("Sonnet 4.5",      "anthropic/claude-sonnet-4.5", "$3/$15 · balanced — most questions"),
+    ("Opus 4.6",        "anthropic/claude-opus-4.6",   "$5/$25 · deep analysis"),
+    ("Opus 4.7",        "anthropic/claude-opus-4.7",   "$5/$25 · deep analysis, newer"),
+    ("Opus 4.8",        "anthropic/claude-opus-4.8",   "$5/$25 · deepest — planning, HLIDs, advisory"),
 ]
 TIER_MODEL = {name: model for name, model, _ in MODEL_TIERS}
 
@@ -50,21 +57,26 @@ def render():
         st.session_state.pending = None  # a starter chip queues a question here
 
     with st.sidebar:
-        # AIP_MODEL picks where the slider starts; the slider is the control from then on.
+        # Model picker: a bordered box of radio-style options — 4 on the left, 4 on the right.
+        # Clicking fills the dot (⚪ -> 🔵) and highlights the button. The single selection is
+        # tracked in session_state (two separate st.radio groups would allow two selections).
         configured = dashboard.secret("AIP_MODEL", agent.DEFAULT_MODEL)
+        names = [n for n, _, _ in MODEL_TIERS]
         start = next((n for n, m, _ in MODEL_TIERS if m == configured), "Opus 4.8")
-        name_slot = st.empty()   # filled after the widget with the resolved model id
-        tier = st.select_slider(
-            "Model",
-            options=[n for n, _, _ in MODEL_TIERS],
-            value=start,
-            help="Slide right for deeper analysis, left for speed and lower cost.",
-            label_visibility="collapsed",
-        )
+        if st.session_state.get("model_name") not in names:
+            st.session_state.model_name = start
+        st.markdown("**Model**")
+        with st.container(border=True):
+            cols = st.columns(2)
+            for col, group in zip(cols, (names[:4], names[4:])):
+                for n in group:
+                    picked = n == st.session_state.model_name
+                    if col.button(f"{'🔵' if picked else '⚪'} {n}", key=f"model::{n}",
+                                  width="stretch", type="primary" if picked else "secondary"):
+                        st.session_state.model_name = n
+                        st.rerun()
+        tier = st.session_state.model_name
         model = TIER_MODEL[tier]
-        name_slot.markdown(f"**Model** &nbsp; `{model}`")
-        if tier.startswith("Haiku"):
-            st.caption("⚠️ Light on multi-step analysis — slide to Opus for planning.")
 
         st.divider()
         st.markdown("**Usage**")
