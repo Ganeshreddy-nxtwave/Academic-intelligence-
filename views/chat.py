@@ -129,6 +129,25 @@ def render():
                 if m.get("cost"):
                     st.caption(f"{m.get('model', '').split('/')[-1]} · "
                                f"${m['cost']:.4f} · {m.get('tokens', 0):,} tokens")
+                # After a grounded plan, offer the opt-in unconstrained ("unruled") view.
+                # Heuristic gate: a plan closes with "utilisation"/"HLID"; skip if the
+                # answer already IS the unconstrained view (avoids a self-referential button).
+                content = m["content"]
+                is_plan = ("utilisation" in content or "HLID" in content
+                           or "Inputs & grounding" in content)
+                already_unruled = ("what could be better" in content.lower()
+                                   or "the one bet" in content.lower())
+                if is_plan and not already_unruled:
+                    if st.button("🔓 Unruled — what could be better?", key=f"unruled::{i}",
+                                 help="Opt-in bolder view: changes across plan, pedagogy, "
+                                      "structure and standards, optimised for placement readiness."):
+                        st.session_state.pending = (
+                            'Now give the unconstrained "what could be better" view for the plan '
+                            "above — the labelled [evidence]/[recommendation] table across academic "
+                            "plan, pedagogy, academic structure and planning standards, optimised "
+                            'for placement readiness, closing with "the one bet".'
+                        )
+                        st.rerun()
 
     # A question comes from the chat box OR a starter chip; both feed the same path.
     typed = st.chat_input("Ask about the academic data…")

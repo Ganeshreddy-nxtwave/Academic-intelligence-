@@ -37,7 +37,7 @@ Follow these three sections, in this order, with these headings.
 
 **3. `## The changes that matter`** — 3–6 numbered changes, each naming the old value → the new value and the evidence forcing it (e.g. "Maths 39→30 sessions: chronically under-delivered at 26/section").
 
-Then a short honest note on what would make it wrong. **Then** the unconstrained view — see *What could be better — the unconstrained view (both jobs)* below.
+Then a short honest note on what would make it wrong. **Stop there** — do **not** append the unconstrained view by default; the grounded plan is the deliverable. End with a one-line offer ("Want the unconstrained *what-could-be-better* view?"), and produce it only if the user asks ("unconstrained view", "what could be better", "unruled", or the app's **Unruled** button). Spec: *What could be better — the unconstrained view (both jobs)* below.
 
 ---
 
@@ -81,16 +81,16 @@ Then the concrete diff — one row per material change:
 ### 5. `## What would make this wrong`
 A short honest note: which numbers are derived vs measured, any template assumptions, and missing data.
 
-### 6. `## What could be better — the unconstrained view`
-The forward-looking pass — see the shared spec in *What could be better — the unconstrained view (both jobs)* below.
+### (on request only) `## What could be better — the unconstrained view`
+**Not part of the default plan.** The five sections above are the deliverable — end with a one-line offer of the unconstrained view, and produce it as a **separate follow-up** only when the user asks ("unconstrained view", "what could be better", "unruled", or the app's **Unruled** button). Spec: *What could be better — the unconstrained view (both jobs)* below.
 
 ---
 
 ## What could be better — the unconstrained view (both jobs)
-The sections above are the **grounded plan** — every number tied to delivery, the standards, or the rules. Append **one more section** that is deliberately *not* bound by that: a forward-looking pass on how the programme could be **better**, optimised for one north star — **placement readiness / employability** (students able to crack at least entry-level tech roles).
+The grounded plan (the sections above) is the **default deliverable**. This unconstrained view is a **separate, opt-in follow-up** — produce it only when the user asks for it (a follow-up like "the unconstrained view" / "what could be better" / "unruled", or the app's **Unruled** button), **never bolted onto the first answer**. It is deliberately *not* bound by the grounding: a forward-looking pass on how the programme could be **better**, optimised for one north star — **placement readiness / employability** (students able to crack at least entry-level tech roles).
 
 Rules for this section:
-- It runs **after** the grounded plan and **never edits its numbers**. It is a separate, bolder view.
+- It is produced **separately from** the grounded plan (on request) and **never edits its numbers**. It is a bolder, standalone view.
 - It may challenge **all four layers**, including ones the grounded plan treats as fixed:
   1. **Academic plan** — session counts, hours, staggering, the calendar.
   2. **Pedagogy** — delivery method, lecture/practice rhythm, hands-on vs theory, assessment cadence, project work.
