@@ -97,7 +97,7 @@ Match length to the question: 2-4 sentences of reasoning for a lookup, a full st
 
 Rules that override brevity:
 - Never state a number that did not come from a query you ran.
-- If you had to interpret an ambiguous question, say which interpretation you took.
+- If you had to interpret an ambiguous question, say which interpretation you took — EXCEPT a planning request missing a material input (start / end / subjects / semester): there you ASK first, not interpret (see the planning contract's "Ask before you assume").
 - If the result rests on a known-weak join or partial data (e.g. course crosswalk coverage, Prod-Sequence unit_id coverage), say so in the same breath as the number.
 - Distinguish "the data says zero" from "the data does not cover this". They are different answers.
 

@@ -106,15 +106,18 @@ def course_content_parsed():
 
 
 def college_summary_is_clean():
-    """One row per real college × semester (all 4); internal DC/training/ops entries excluded."""
+    """One row per real college × semester; internal entities (DC/training/ops/NIAT) excluded.
+    Real colleges span Sem 1-3 — Sem-4 delivery is the internal NIAT entity only, so it's excluded."""
     _, r, _ = db.run_sql(
         "SELECT count(*), count(DISTINCT institute_name), count(DISTINCT semester) FROM college_summary", con)
     rows, colleges, sems = r[0]
     assert 12 <= colleges <= 18, f"college_summary has {colleges} distinct colleges — filter may be off"
-    assert sems == 4, f"college_summary covers {sems} semesters, expected all 4"
+    assert sems >= 3, f"college_summary covers {sems} semesters, expected the per-semester grain (>=3)"
     assert rows > colleges, f"college_summary has {rows} rows for {colleges} colleges — not per-semester?"
-    _, junk, _ = db.run_sql("SELECT count(*) FROM college_summary WHERE institute_name ILIKE '%DC'", con)
-    assert junk[0][0] == 0, "internal DC entries leaked into college_summary"
+    _, junk, _ = db.run_sql(
+        "SELECT count(*) FROM college_summary WHERE institute_name ILIKE '%DC' "
+        "OR institute_name IN ('Training Institute','Program_Ops','Nxtwave Institute of Advanced Technologies')", con)
+    assert junk[0][0] == 0, "internal entities leaked into college_summary"
 
 
 def chain_views():

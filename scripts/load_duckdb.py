@@ -297,7 +297,11 @@ def build(db="data/aip.duckdb", verbose=True):
         -- real colleges only: drop internal distribution/training/ops entries
         WHERE d.scheduled_sessions > 100
           AND d.institute_name NOT ILIKE '%DC'
-          AND d.institute_name NOT IN ('Training Institute', 'Program_Ops')
+          -- internal entities, not partner colleges. The last one used to be excluded by
+          -- luck (it had <100 Sem-1 sessions); per-semester it clears the bar elsewhere, so
+          -- name it explicitly or it leaks into the "colleges" list.
+          AND d.institute_name NOT IN ('Training Institute', 'Program_Ops',
+                                       'Nxtwave Institute of Advanced Technologies')
         ORDER BY d.institute_name, d.semester""")
 
     # session_link: the fuzzy bridge reconnecting the two delivery tables that share no

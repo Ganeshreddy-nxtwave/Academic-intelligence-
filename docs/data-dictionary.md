@@ -137,10 +137,10 @@ The 63-course catalogue across 11 stacks. `stack`, `course_title`, `course_ids`,
 | **`session_link`** | 157,502 | The spine: every `delivered_niat` session with its `session_id`/`unit_id` where the fuzzy bridge to `delivered_sessions` matched. `linked` + `link_precision` flag confidence (~76% minute, ~85% day). |
 | **`academic_plan_derived`** | 335 | Planning metrics derived from *delivery* for **all** universities: `sessions_per_section` (**lecture/teaching** sessions per section — same basis as the HLID's planned session count, so it matches `course_plan_vs_actual`), teaching_weeks, first/last_session, start_slip_days, pct_completed. |
 | **`course_plan_vs_actual`** | 159 | The designed vs delivered comparison per course (16 universities with HLID). `coverage` = both / planned_not_delivered / delivered_not_planned; `session_gap` = actual − planned. |
-| **`session_feedback_safe`** | 8,529 | Agent-facing feedback (ratings only, no comment text). |
+| **`session_feedback_safe`** | 6,945 | Agent-facing feedback (ratings only, no comment text). |
 | **`content_all`** | 33,213 | Unified content across the catalogue tables (reading/objective/coding/**editorial**) + `course_content`, keyed by `course` + `unit_id`. Use this for "what content exists". |
 | **`content_units`** | 20,745 | Distinct content `unit_id` ↔ `course_title`. |
-| **`college_summary`** | 39 | One row per real college × **semester** (all 4): sections, courses, completion, avg ratings, recorded_issues, has_designed_plan. The "how is X doing" table. Feedback NULL for Sem 3/4; filter `WHERE semester=…`. |
+| **`college_summary`** | 37 | One row per real college × **semester** (Sem 1-3; Sem-4 is the internal NIAT entity only, excluded): sections, courses, completion, avg ratings, recorded_issues, has_designed_plan. The "how is X doing" table. Feedback NULL for Sem 3; filter `WHERE semester=…`. |
 | **`delivered_sections`** | 239,676 | Section-normalised scheduling. |
 | **`deviation`** | 24,813 | Unit-level planned_start vs actual_start drift (Sem-1 designed unis). |
 
