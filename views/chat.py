@@ -57,24 +57,21 @@ def render():
         st.session_state.pending = None  # a starter chip queues a question here
 
     with st.sidebar:
-        # Model picker: a bordered box of radio-style options — 4 on the left, 4 on the right.
-        # Clicking fills the dot (⚪ -> 🔵) and highlights the button. The single selection is
-        # tracked in session_state (two separate st.radio groups would allow two selections).
+        # Model picker: ONE collapsed panel — closed by default, showing the current model.
+        # Click to open -> a single radio group of all models; the selected circle fills blue
+        # (theme primaryColor in .streamlit/config.toml). Picking one reruns and re-collapses.
         configured = dashboard.secret("AIP_MODEL", agent.DEFAULT_MODEL)
         names = [n for n, _, _ in MODEL_TIERS]
         start = next((n for n, m, _ in MODEL_TIERS if m == configured), "Opus 4.8")
         if st.session_state.get("model_name") not in names:
             st.session_state.model_name = start
-        st.markdown("**Model**")
-        with st.container(border=True):
-            cols = st.columns(2)
-            for col, group in zip(cols, (names[:4], names[4:])):
-                for n in group:
-                    picked = n == st.session_state.model_name
-                    if col.button(f"{'🔵' if picked else '⚪'} {n}", key=f"model::{n}",
-                                  width="stretch", type="primary" if picked else "secondary"):
-                        st.session_state.model_name = n
-                        st.rerun()
+        with st.expander(f"Model — {st.session_state.model_name}", expanded=False):
+            picked = st.radio("Model", names,
+                              index=names.index(st.session_state.model_name),
+                              label_visibility="collapsed")
+            if picked != st.session_state.model_name:
+                st.session_state.model_name = picked
+                st.rerun()
         tier = st.session_state.model_name
         model = TIER_MODEL[tier]
 

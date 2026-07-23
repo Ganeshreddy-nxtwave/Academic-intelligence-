@@ -1,0 +1,4 @@
+# App theme. primaryColor drives accent elements — including the selected radio
+# circle in the model picker, which the design wants blue.
+[theme]
+primaryColor = "#1c83e1"
