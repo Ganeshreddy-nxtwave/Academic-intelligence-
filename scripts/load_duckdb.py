@@ -254,9 +254,9 @@ def build(db="data/aip.duckdb", verbose=True):
     # college_summary: one row per (college, SEMESTER) — the at-a-glance health view. Powers the
     # copilot's most common questions ("how is X doing", "compare colleges", "which is
     # struggling") so it doesn't reassemble the same 4-table join every time.
-    # Covers ALL semesters delivery data spans (1-4). Only is_scheduled sessions count toward
-    # completion. Feedback columns are NULL for Sem 3/4 — feedback links via session_id, which
-    # only exists in delivered_sessions (Sem 1+2); has_designed_plan is true only for Sem 1
+    # SCOPE: Sem 1-2 only. Sem 3/4 are out of scope — Sem 3 has no feedback/content/designed
+    # data, and Sem-4 delivery is the internal NIAT entity only (no partner college). Only
+    # is_scheduled sessions count toward completion; has_designed_plan is true only for Sem 1
     # (designed data is Sem-1 only). Filter on `semester` for a single-semester snapshot.
     con.execute("""CREATE VIEW college_summary AS
         WITH d AS (
@@ -270,7 +270,7 @@ def build(db="data/aip.duckdb", verbose=True):
                    max(start_ts) FILTER (WHERE is_scheduled)::DATE       AS last_session,
                    count(DISTINCT date_trunc('week', start_ts)
                          ) FILTER (WHERE is_scheduled)                   AS teaching_weeks
-            FROM delivered_niat GROUP BY 1, 2
+            FROM delivered_niat WHERE semester IN ('Semester 1', 'Semester 2') GROUP BY 1, 2
         ),
         -- feedback carries no semester; recover it via the session_id -> semester map in
         -- delivered_sessions (Sem 1+2 only), so Sem 3/4 correctly get NULL ratings.

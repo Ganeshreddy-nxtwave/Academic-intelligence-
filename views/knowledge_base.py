@@ -75,9 +75,11 @@ def render():
         st.info("No colleges with delivery data found.")
         return
     uni = _uni_grid(colleges)
+    # Scope: Sem 1-2 only. Sem 3/4 are out of scope (no feedback/content/designed data;
+    # Sem-4 delivery is the internal NIAT entity only).
     sems = [r[0] for r in con.execute(
-        "SELECT DISTINCT semester FROM delivered_niat WHERE institute_name=? AND semester IS NOT NULL ORDER BY 1",
-        [uni]).fetchall()] or ["Semester 1"]
+        "SELECT DISTINCT semester FROM delivered_niat WHERE institute_name=? "
+        "AND semester IN ('Semester 1','Semester 2') ORDER BY 1", [uni]).fetchall()] or ["Semester 1"]
     sem = st.radio("Semester", sems, horizontal=True, key="kb_sem")
     st.divider()
     st.subheader(f"{uni} · {sem}")

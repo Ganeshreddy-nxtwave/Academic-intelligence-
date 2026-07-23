@@ -106,13 +106,15 @@ def course_content_parsed():
 
 
 def college_summary_is_clean():
-    """One row per real college × semester; internal entities (DC/training/ops/NIAT) excluded.
-    Real colleges span Sem 1-3 — Sem-4 delivery is the internal NIAT entity only, so it's excluded."""
+    """One row per real college × semester, SCOPED TO SEM 1-2; internal entities excluded.
+    Sem 3/4 are out of scope (no feedback/content/designed data; Sem 4 is internal-only)."""
     _, r, _ = db.run_sql(
         "SELECT count(*), count(DISTINCT institute_name), count(DISTINCT semester) FROM college_summary", con)
     rows, colleges, sems = r[0]
     assert 12 <= colleges <= 18, f"college_summary has {colleges} distinct colleges — filter may be off"
-    assert sems >= 3, f"college_summary covers {sems} semesters, expected the per-semester grain (>=3)"
+    assert sems == 2, f"college_summary covers {sems} semesters; scope is Sem 1-2 (Sem 3/4 out of scope)"
+    _, oos, _ = db.run_sql("SELECT count(*) FROM college_summary WHERE semester IN ('Semester 3','Semester 4')", con)
+    assert oos[0][0] == 0, "out-of-scope Sem 3/4 rows in college_summary"
     assert rows > colleges, f"college_summary has {rows} rows for {colleges} colleges — not per-semester?"
     _, junk, _ = db.run_sql(
         "SELECT count(*) FROM college_summary WHERE institute_name ILIKE '%DC' "
