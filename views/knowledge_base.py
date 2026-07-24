@@ -47,9 +47,10 @@ digraph model {
 
   subgraph cluster_subj {
     label="Subjects & names"; style=rounded; color="#c5cae9"; fontsize=9;
-    ST  [label="subject_tags\\n(nxtwave_tag)" fillcolor="#e3f2fd"];
+    ST  [label="subject_tags\\n(nxtwave_tag, course_id)" fillcolor="#e3f2fd"];
     TCM [label="tag_content_map" fillcolor="#e3f2fd"];
     XW  [label="course_crosswalk" fillcolor="#e3f2fd"];
+    CO  [label="courses\\n(NxtWave catalogue)" fillcolor="#e3f2fd"];
   }
   subgraph cluster_content {
     label="Content"; style=rounded; color="#90caf9"; fontsize=9;
@@ -83,14 +84,14 @@ digraph model {
     CS  [label="college_summary" fillcolor="#eceff1"];
   }
   subgraph cluster_ref {
-    label="Reference — no join"; style="rounded,dashed"; color="#bbb"; fontsize=9;
+    label="Reference — yardsticks (no join key)"; style="rounded,dashed"; color="#bbb"; fontsize=9;
     PS  [label="planning_standards" fillcolor="#fafafa"];
     SR  [label="scheduling_rules" fillcolor="#fafafa"];
-    CO  [label="courses" fillcolor="#fafafa"];
   }
 
   RAW  -> CA   [label="unit_id"];
   ST   -> TCM  [label="nxtwave_tag"];
+  ST   -> CO   [label="course_id = course_ids" style=dashed];
   TCM  -> CA   [label="content course = course"];
   ST   -> DN   [label="course_key ~ name" style=dashed];
   U    -> DN   [label="institute_name"];
@@ -163,8 +164,9 @@ def render():
         st.dataframe([{"Join key": k, "Connects": c, "Notes": n} for k, c, n in KEY_LEGEND],
                      width="stretch", hide_index=True)
         st.caption("Solid edge = reliable id/name join · dashed = fuzzy/best-effort "
-                   "(session_link, feedback-by-unit, name normalisation). "
-                   "Full write-up: docs/data-linkage.md.")
+                   "(session_link, feedback-by-unit, name normalisation, courses by course UUID). "
+                   "Only planning_standards & scheduling_rules have no join key — they're the "
+                   "yardsticks the planner checks against. Full write-up: docs/data-linkage.md.")
 
     try:
         st.graphviz_chart(CHAIN_DOT, width="stretch")
