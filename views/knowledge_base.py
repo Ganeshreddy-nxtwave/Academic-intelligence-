@@ -194,6 +194,10 @@ def render():
 
     # 1) SUBJECTS -> CONTENT : crosswalk (their name <-> tag) + content counts
     with tabs[0]:
+        st.caption("ℹ️ **How this is computed** — start with this university's own course list "
+                   "(subject_tags), read the NxtWave subject tag each course maps to, then count the "
+                   "reading/objective/quiz/coding pieces tied to that tag (tag_content_map → content_all). "
+                   "'—' = no content ingested for that subject yet.")
         subs = con.execute("""
             WITH tc AS (
                 SELECT tcm.nxtwave_tag,
@@ -227,6 +231,10 @@ def render():
 
     # 2) COURSES -> SESSIONS : the chain rows (scheduling + feedback + instructor)
     with tabs[1]:
+        st.caption("ℹ️ **How this is computed** — list this course's delivered sessions (session_link), "
+                   "match each to the scheduling data by the fuzzy bridge (institute + title + start-time, "
+                   "since the two delivery exports share no id), then attach its content unit (unit_id) and "
+                   "the student teaching rating (session_id → feedback).")
         courses = [r[0] for r in con.execute("""SELECT DISTINCT course_title FROM session_link
             WHERE institute_name = ? AND semester = ? AND is_curriculum(course_title)
             ORDER BY 1""", [uni, sem]).fetchall()]
@@ -256,6 +264,9 @@ def render():
 
     # 3) INSTRUCTOR DELIVERY : per-instructor stats, derived from the chain (session_link)
     with tabs[2]:
+        st.caption("ℹ️ **How this is computed** — for each instructor this semester, count their scheduled "
+                   "sessions, distinct courses, and the share marked COMPLETED — all read from the delivery "
+                   "chain (session_link). Low completion can reflect scheduling, not the instructor.")
         instr = con.execute("""SELECT instructor_name, any_value(instructor_category) AS cat,
                 count(*) FILTER (WHERE is_scheduled)                          AS sessions,
                 count(DISTINCT course_title)                                 AS courses,
@@ -283,6 +294,10 @@ def render():
 
     # 4) ACADEMIC PLANNING : derived (all unis) + designed (the 4)
     with tabs[3]:
+        st.caption("ℹ️ **How this is computed** — the first table is derived from what actually ran "
+                   "(academic_plan_derived). The second is the designed HLID plan (course_plan_vs_actual), "
+                   "matching each planned course to delivery by name, shared subject tag, or a near-identical "
+                   "name; Gap = actual − planned sessions/section.")
         st.markdown("**Derived from delivery** (available for every university). "
                     "*Sessions/section* = lecture (teaching) sessions per section — the same basis "
                     "as the plan below, so a course's number matches across both tables.")
@@ -374,6 +389,9 @@ def render():
 
     # 5) ALIGNMENT : how well each link in the chain holds
     with tabs[4]:
+        st.caption("ℹ️ **How this is computed** — each row is 'how many of X have Y': delivered courses that "
+                   "carry a subject tag, sessions matched to scheduling (the fuzzy bridge), sessions with a "
+                   "named instructor, and sessions that have feedback. 🟢 ≥80% · 🟡 ≥50% · 🔴 below.")
         st.markdown("**How well the chain links up for this university & semester**")
         # course -> tag coverage
         cov = con.execute("""
@@ -437,6 +455,9 @@ def render():
     # semester column; its session_id places it in a semester). IN-subquery avoids the
     # row duplication a direct join would cause when a session_id fuzzy-matches twice.
     with tabs[5]:
+        st.caption("ℹ️ **How this is computed** — student feedback has no semester of its own, so each rating "
+                   "is placed in this semester through its session's scheduling link (session_id via "
+                   "session_link), then averaged (understanding & teaching) and the lowest-rated sessions listed.")
         sem_sessions = """(SELECT DISTINCT session_id FROM session_link
                            WHERE institute_name=? AND semester=? AND session_id IS NOT NULL)"""
         agg = con.execute(f"""SELECT count(*), round(avg(TRY_CAST(session_understanding_rating AS DOUBLE)),2),
