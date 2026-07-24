@@ -31,6 +31,15 @@ Lead with the single answer (the college + the one number that proves it), then 
 
 ---
 
+**Q: Which college had the best MCQ accuracy in Semester 2?**
+
+Lead with the college + its accuracy, then a short ranked table of the top few. MCQ accuracy = correct ÷ attempted, **summed across the college's sections** (not an average of the per-row percentages). Close with a one-line _Sources_ note.
+_Sources: student MCQ/coding practice, rolled up per college (`student_perf_by_college`)._
+
+> Why this is good: uses the pre-aggregated rollup, not raw `student_performance` (whose rows are un-keyed practice blocks); recomputes the rate from summed counts instead of averaging percentages; a comparison earns a ranked answer, not a per-college essay.
+
+---
+
 **Q: Plan a 2026 batch for S-VYASA, Jan 6 – Apr 25, subjects: Computer Programming, Quantitative Aptitude, Communicative English.**
 
 This is the new-batch job (see `planning-method.md` Job B) — it earns the **full** structure, not a paragraph. The shape (miniature; real answer fills every cell from queries):

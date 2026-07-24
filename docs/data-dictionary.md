@@ -5,7 +5,7 @@ files under `data/canonical/<domain>/`; **views** are built by `scripts/load_duc
 and pre-solve the cross-domain joins. Query any of them read-only.
 
 **Join keys at a glance:** `unit_id` (universal content key) · `session_id` (scheduling ↔
-feedback) · `institute_name` (delivery ↔ feedback ↔ issues) · `nxtwave_tag` (subject ↔
+feedback) · `institute_name` (delivery ↔ feedback ↔ issues ↔ student performance) · `nxtwave_tag` (subject ↔
 content) · designed↔delivered bridges fuzzily via `session_link` / `course_plan_vs_actual`.
 For the whole picture — every layer and the key on each edge — see [`data-linkage.md`](data-linkage.md).
 
@@ -42,6 +42,19 @@ Key cols: `institute_name`, `session_id`, `unit_ids`, `total_feedbacks`,
 Joins to scheduling on `session_id`, to content on `unit_ids`.
 > Contains counts only — comment text is not stored here. Use the **`session_feedback_safe`**
 > view (identical minus any free-text-adjacent columns) for the agent.
+
+---
+
+## performance/ — student outcomes (MCQ & coding)
+
+### `student_performance` (table · 1,826 rows) — `build_student_performance.py`
+One row per MCQ/coding **practice block**. Grain: college × semester × section, but **many rows
+per section with no course/date key** — a single row is *not* a section total; aggregate.
+Key cols: `institute_name` (added via a curated crosswalk so it matches the model), `semester`,
+`section` (`S-0NN`), `students`, and paired MCQ/coding counts (`*_attempts`, `*_expected_attempts`,
+`mcq_correct`, `coding_completions`) plus per-row rates. Links on `institute_name` + `semester` + `section`.
+> Query the **`student_perf_by_section`** / **`student_perf_by_college`** views, not this raw table —
+> they sum the counts and recompute every rate (never average a per-row %).
 
 ---
 
@@ -144,6 +157,8 @@ The 63-course catalogue across 11 stacks. `stack`, `course_title`, `course_ids`,
 | **`college_summary`** | 33 | One row per real college × **semester** (Sem 1-2; Sem 3/4 out of scope): sections, courses, completion, avg ratings, recorded_issues, has_designed_plan. The "how is X doing" table. Filter `WHERE semester=…`. |
 | **`delivered_sections`** | 239,676 | Section-normalised scheduling. |
 | **`deviation`** | 24,813 | Unit-level planned_start vs actual_start drift (Sem-1 designed unis). |
+| **`student_perf_by_section`** | 143 | Per college × semester × **section** MCQ/coding: summed attempts/correct/completions + recomputed attempt/accuracy/completion %; `*_attendance_pct` = practice-weighted mean. |
+| **`student_perf_by_college`** | 30 | Same MCQ/coding measures rolled to college × semester — for cross-college comparison. |
 
 ---
 

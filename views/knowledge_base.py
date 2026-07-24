@@ -74,6 +74,7 @@ digraph model {
     FB  [label="session_feedback_safe" fillcolor="#e8f5e9"];
     INS [label="instructor_sessions" fillcolor="#e8f5e9"];
     ISS [label="issues" fillcolor="#e8f5e9"];
+    SP  [label="student_performance\\n(mcq · coding)" fillcolor="#e8f5e9"];
   }
   subgraph cluster_derived {
     label="Derived views"; style=rounded; color="#b0bec5"; fontsize=9;
@@ -112,6 +113,7 @@ digraph model {
   ISS  -> CS   [label="institute_name"];
   ISS  -> DN   [label="institute_name"];
   INS  -> DN   [label="instructor_name"];
+  U    -> SP   [label="institute_name + semester + section"];
   DS   -> DSEC;
   XW   -> DN   [label="normalises names" style=dashed];
 }
@@ -125,6 +127,7 @@ KEY_LEGEND = [
     ("universities.code ↔ institute_name", "designed layer ↔ delivered layer", "HLID uses codes; delivery uses full names."),
     ("nxtwave_tag", "subject ↔ content", "subject_tags → tag_content_map → content_all."),
     ("session_link (fuzzy)", "delivered_niat ↔ delivered_sessions", "No shared id — matched on institute+title+time (~85%)."),
+    ("institute_name + semester + section", "student performance ↔ delivery/feedback", "Per-section MCQ/coding; many rows/section, no course key — aggregate first."),
 ]
 
 
@@ -190,7 +193,7 @@ def render():
     st.subheader(f"{uni} · {sem}")
 
     tabs = st.tabs(["Subjects → Content", "Courses → Sessions", "Instructor Delivery",
-                    "Academic Planning", "Alignment", "Feedback"])
+                    "Academic Planning", "Alignment", "Feedback", "Student Performance"])
 
     # 1) SUBJECTS -> CONTENT : crosswalk (their name <-> tag) + content counts
     with tabs[0]:
@@ -480,3 +483,38 @@ def render():
             st.caption(f"Student feedback for {sem} (placed via the session's scheduling link).")
         else:
             st.info(f"No feedback recorded for {uni} in {sem}.")
+
+    # 7) STUDENT PERFORMANCE — MCQ & coding practice, rolled up per section from the
+    # un-keyed raw rows (rates recomputed from summed counts; attendance practice-weighted).
+    with tabs[6]:
+        st.caption("ℹ️ **How this is computed** — the MCQ/coding practice rows for this college & semester "
+                   "(student_performance) are many-per-section with no course key, so we sum the counts per "
+                   "section and recompute each rate (attempt, accuracy, completion); attendance is a "
+                   "practice-weighted average. Linked on institute_name + semester + section.")
+        tot = con.execute("""SELECT students, mcq_attempts, mcq_accuracy_pct, mcq_attendance_pct,
+                   coding_attempts, coding_completion_pct
+            FROM student_perf_by_college WHERE institute_name=? AND semester=?""", [uni, sem]).fetchone()
+        rows = con.execute("""SELECT section, students, scheduled_mcq, mcq_attempts, mcq_attempt_pct,
+                   mcq_accuracy_pct, mcq_attendance_pct, scheduled_coding, coding_attempts,
+                   coding_completion_pct, coding_attendance_pct
+            FROM student_perf_by_section WHERE institute_name=? AND semester=? ORDER BY section""",
+            [uni, sem]).fetchall()
+        if tot and rows:
+            k = st.columns(3)
+            k[0].metric("MCQ accuracy", f"{_flag(tot[2] or 0)} {tot[2] or 0}%",
+                        help="Correct ÷ attempted, summed across the semester.")
+            k[1].metric("Coding completion", f"{_flag(tot[5] or 0)} {tot[5] or 0}%",
+                        help="Problems completed ÷ attempted, summed across the semester.")
+            k[2].metric("Avg attendance (MCQ)", f"{tot[3] or 0}%",
+                        help="Practice-weighted mean of per-practice attendance.")
+            st.dataframe([{
+                "Section": r[0], "Students": r[1],
+                "MCQ practices": r[2], "MCQ attempts": r[3], "MCQ attempt %": r[4],
+                "MCQ accuracy %": r[5], "MCQ attendance %": r[6],
+                "Coding practices": r[7], "Coding attempts": r[8],
+                "Coding completion %": r[9], "Coding attendance %": r[10]} for r in rows],
+                width="stretch", hide_index=True)
+            st.caption("Attendance is a practice-weighted average (a per-practice student count, not additive). "
+                       "Blank rates mean no attempts were recorded for that section.")
+        else:
+            st.info(f"No MCQ/coding practice data for {uni} in {sem}.")

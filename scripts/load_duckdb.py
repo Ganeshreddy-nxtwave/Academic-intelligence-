@@ -367,6 +367,39 @@ def build(db="data/aip.duckdb", verbose=True):
         WHERE is_curriculum(d.course_title)
         GROUP BY d.institute_name, d.semester, d.course_title, sc.n_sections""")
 
+    # --- student performance (MCQ & coding practice) ---
+    # student_performance rows are un-keyed within a section (many rows per section, no
+    # course/date column), so we roll up: SUM the additive counts and RECOMPUTE every rate
+    # (never average a per-row %). Attendance is a per-block student count (not additive)
+    # -> practice-weighted mean, surfaced as *_attendance_pct. Links to the rest of the
+    # model on institute_name + semester (+ section). Grain differs only in the GROUP BY.
+    for _view, _grain in [("student_perf_by_section", "sp.institute_name, sp.semester, sp.section"),
+                          ("student_perf_by_college", "sp.institute_name, sp.semester")]:
+        con.execute(f"""CREATE VIEW {_view} AS
+            SELECT {_grain},
+                   max(TRY_CAST(sp.students AS BIGINT))                   AS students,
+                   sum(TRY_CAST(sp.scheduled_mcq_practices AS BIGINT))    AS scheduled_mcq,
+                   sum(TRY_CAST(sp.mcq_attempts AS BIGINT))               AS mcq_attempts,
+                   sum(TRY_CAST(sp.mcq_expected_attempts AS BIGINT))      AS mcq_expected,
+                   round(100.0 * sum(TRY_CAST(sp.mcq_attempts AS BIGINT))
+                         / nullif(sum(TRY_CAST(sp.mcq_expected_attempts AS BIGINT)), 0), 1)   AS mcq_attempt_pct,
+                   round(100.0 * sum(TRY_CAST(sp.mcq_correct AS BIGINT))
+                         / nullif(sum(TRY_CAST(sp.mcq_attempts AS BIGINT)), 0), 1)            AS mcq_accuracy_pct,
+                   round(sum(TRY_CAST(sp.mcq_attendance_pct AS DOUBLE) * TRY_CAST(sp.scheduled_mcq_practices AS DOUBLE))
+                         / nullif(sum(TRY_CAST(sp.scheduled_mcq_practices AS DOUBLE)), 0), 1) AS mcq_attendance_pct,
+                   sum(TRY_CAST(sp.scheduled_coding_practices AS BIGINT)) AS scheduled_coding,
+                   sum(TRY_CAST(sp.coding_attempts AS BIGINT))            AS coding_attempts,
+                   sum(TRY_CAST(sp.coding_expected_attempts AS BIGINT))   AS coding_expected,
+                   round(100.0 * sum(TRY_CAST(sp.coding_attempts AS BIGINT))
+                         / nullif(sum(TRY_CAST(sp.coding_expected_attempts AS BIGINT)), 0), 1) AS coding_attempt_pct,
+                   sum(TRY_CAST(sp.coding_completions AS BIGINT))         AS coding_completions,
+                   round(100.0 * sum(TRY_CAST(sp.coding_completions AS BIGINT))
+                         / nullif(sum(TRY_CAST(sp.coding_attempts AS BIGINT)), 0), 1)          AS coding_completion_pct,
+                   round(sum(TRY_CAST(sp.coding_attendance_pct AS DOUBLE) * TRY_CAST(sp.scheduled_coding_practices AS DOUBLE))
+                         / nullif(sum(TRY_CAST(sp.scheduled_coding_practices AS DOUBLE)), 0), 1) AS coding_attendance_pct
+            FROM student_performance sp
+            GROUP BY {_grain}""")
+
     if verbose:
         print("=== aip.duckdb (from committed canonical) ===")
         for (t,) in con.execute("SHOW TABLES").fetchall():

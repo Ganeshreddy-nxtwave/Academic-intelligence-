@@ -133,6 +133,23 @@ def chain_views():
     assert u[0][0] >= 17, f"academic_plan_derived covers too few universities: {u[0][0]}"
 
 
+def student_perf_rollups():
+    """Student MCQ/coding rollups: 15 colleges × Sem 1-2, rates in [0,100], and every
+    college joins to the model (present in college_summary) — proves the crosswalk held."""
+    _, r, _ = db.run_sql("""SELECT count(*), count(DISTINCT institute_name), count(DISTINCT semester)
+        FROM student_perf_by_college""", con)
+    rows, colleges, sems = r[0]
+    assert colleges == 15 and sems == 2, f"by_college is {colleges} colleges × {sems} sems (expect 15 × 2)"
+    assert rows == 30, f"by_college has {rows} rows (expect 30 = 15 × 2)"
+    _, bad, _ = db.run_sql("""SELECT count(*) FROM student_perf_by_section
+        WHERE mcq_accuracy_pct NOT BETWEEN 0 AND 100 OR coding_completion_pct NOT BETWEEN 0 AND 100
+           OR mcq_attempt_pct NOT BETWEEN 0 AND 100 OR mcq_attendance_pct NOT BETWEEN 0 AND 100""", con)
+    assert bad[0][0] == 0, "student_perf rate out of [0,100]"
+    _, miss, _ = db.run_sql("""SELECT count(*) FROM (SELECT DISTINCT institute_name FROM student_perf_by_college) s
+        WHERE institute_name NOT IN (SELECT institute_name FROM college_summary)""", con)
+    assert miss[0][0] == 0, "a student_perf college is missing from college_summary — crosswalk broke"
+
+
 def derived_plan_excludes_noise():
     """The subjects sheet is the truth for what a course is; academic_plan_derived
     must exclude non-curriculum noise (orientation, placement tests, assessments)."""
@@ -263,6 +280,7 @@ check("English content ingested (paged) + mapped to subjects", english_content_i
 check("derived plan excludes non-curriculum noise", derived_plan_excludes_noise)
 check("chain views (session_link + academic_plan_derived)", chain_views)
 check("college_summary is clean (real colleges only)", college_summary_is_clean)
+check("student performance rollups (grain + rates + join)", student_perf_rollups)
 check("recorded issues join to institutes", issues_join_to_institutes)
 check("session_feedback_safe excludes comment text", feedback_safe_hides_comments)
 
