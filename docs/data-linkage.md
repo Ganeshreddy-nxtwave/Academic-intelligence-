@@ -23,9 +23,10 @@ One picture of how the whole store links up. For per-table structure see
 ```mermaid
 flowchart LR
   subgraph SUBJ["Subjects & names"]
-    ST["subject_tags<br/>(nxtwave_tag)"]
+    ST["subject_tags<br/>(nxtwave_tag, course_id)"]
     TCM["tag_content_map"]
     XW["course_crosswalk"]
+    CO["courses<br/>(NxtWave catalogue)"]
   end
   subgraph CONTENT["Content"]
     RAW["reading / objective /<br/>coding / editorials<br/>+ course_content"]
@@ -53,14 +54,14 @@ flowchart LR
     DEV["deviation"]
     CS["college_summary"]
   end
-  subgraph REF["Reference — no join"]
+  subgraph REF["Reference — yardsticks (no join key)"]
     PS["planning_standards"]
     SR["scheduling_rules"]
-    CO["courses"]
   end
 
   RAW -->|unit_id| CA
   ST -->|nxtwave_tag| TCM
+  ST -.->|course_id = course_ids| CO
   TCM -->|content course = course| CA
   ST -->|course_key ~ name| DN
   U -->|institute_name| DN
@@ -103,5 +104,8 @@ it collapses for Sem 3/4 (which is why those semesters are out of scope).
 - **Dashed arrow** = a fuzzy / best-effort link (`session_link`, feedback-by-unit, name normalisation).
 - **Derived views** are computed *from* the tables that point into them (e.g. `college_summary` rolls up
   delivery + feedback + issues per college × semester; `course_plan_vs_actual` compares designed vs delivered).
-- **Reference** tables (`planning_standards`, `scheduling_rules`, `courses`) don't join — they're the yardsticks
-  and the catalogue the agent reasons against.
+- **`courses`** (the NxtWave course catalogue) *does* link: `subject_tags.course_id = courses.course_ids` (the
+  NxtWave course UUID). It's a partial catalogue (63 rows — ~82 of the 230 tagged subjects resolve to one), so
+  the edge is dashed. It tells you the canonical course title, its stack, and whether content exists.
+- **Reference yardsticks** — only `planning_standards` and `scheduling_rules` truly have no join key. They're
+  plain-text standards (AICTE budgets, session norms) the planner *checks against*, not rows that link.
